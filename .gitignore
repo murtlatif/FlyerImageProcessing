@@ -1,0 +1,15 @@
+# Python Cache
+__pycache__/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Environments
+.env
+
+# Editors
+.vscode/
+.idea/
+
+# Executables
+*.exe
