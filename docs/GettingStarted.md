@@ -32,3 +32,10 @@ To install all the necessary libraries, perform a `pip install` from the `requir
 pip install -r requirements.txt
 ```
 
+## Configuration Setup
+
+To setup your environment configuration, you must create a `.env` file in the root directory. To do this, copy and paste the `.env.example` file, which will contain all the current keys for the dotenv configuration.
+
+Set the values in the `.env` file as needed.
+
+For more information on configuration, please read [the Configuration documentation](./Configuration.md).
