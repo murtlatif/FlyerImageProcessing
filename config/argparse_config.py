@@ -6,6 +6,14 @@ class ArgparseConfig:
     _args: Namespace = None
     _parser: ArgumentParser = None
 
+    def __contains__(self, key: str) -> bool:
+        return key in self.args
+
+    def __getitem__(self, key: str):
+        if key not in self.args:
+            raise KeyError(f'ArgparseConfig has no item \'{key}\'')
+        return getattr(self.args, key)
+
     def __getattr__(self, name: str):
         return getattr(self.args, name)
 
@@ -27,4 +35,5 @@ class ArgparseConfig:
         pass
 
     def _add_arguments_to_parser(self, parser: ArgumentParser):
-        pass
+        parser.add_argument('--img', help='File path to test image')
+        parser.add_argument('-a', '--annotations', help='File path to annotation JSON')

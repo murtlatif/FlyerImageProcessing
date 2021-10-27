@@ -1,7 +1,7 @@
-from .dotenv_config import DotenvConfig
 from .argparse_config import ArgparseConfig
+from .dotenv_config import DotenvConfig
 
 
 class Config:
-    env: DotenvConfig = DotenvConfig()
     args: ArgparseConfig = ArgparseConfig()
+    env: DotenvConfig = DotenvConfig()

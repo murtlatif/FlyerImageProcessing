@@ -67,7 +67,7 @@ To add a configuration variable, create a new key-value entry in the form of `KE
 MY_ARG=2
 ```
 
-> 🙏 Please remember to update the `.env.example` file with your key and an example value if you are creating a new variable. Do not use any sensitive information in the sample value.
+> 🙏 Please remember to update the `.env.example` file with your key and an example value, and the `config/env_keys.py` file with your key as a constant if you are creating a new variable. Do not use any sensitive information in the sample value.
 
 To learn more about the rules of the dotenv configuration, visit [the python-dotenv documentation](https://pypi.org/project/python-dotenv/).
 

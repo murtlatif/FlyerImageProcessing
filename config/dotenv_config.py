@@ -1,4 +1,5 @@
 from typing import Dict, Union
+
 from dotenv import dotenv_values
 
 
@@ -6,7 +7,18 @@ class DotenvConfig:
     """Configuration for environment variables"""
     _config = None
 
-    def __getattr__(self, name: str):
+    def __contains__(self, key: str) -> bool:
+        return key in self.config
+
+    def __getitem__(self, key: str) -> str:
+        if key not in self.config:
+            raise KeyError(f'DotenvConfig has no item \'{key}\'')
+        return self.config[key]
+
+    def __getattr__(self, name: str) -> str:
+        if name not in self.config:
+            raise AttributeError(f'DotenvConfig has no attribute \'{name}\'.')
+
         return self.config[name]
 
     @property
