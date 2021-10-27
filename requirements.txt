@@ -24,7 +24,6 @@ protobuf==3.18.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycodestyle==2.8.0
-pylint==2.11.1
 pyparsing==2.4.7
 PyQt5==5.15.4
 PyQt5-Qt5==5.15.2
