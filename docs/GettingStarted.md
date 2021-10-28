@@ -32,6 +32,10 @@ To install all the necessary libraries, perform a `pip install` from the `requir
 pip install -r requirements.txt
 ```
 
+### Linting
+
+This will also install `pycodestyle` for linting and `autopep8` for auto formatting. Be sure to select `pycodestyle` as your linter if your IDE supports it, or simply run `pycodestyle` in the directory before comitting a change.
+
 ## Configuration Setup
 
 To setup your environment configuration, you must create a `.env` file in the root directory. To do this, copy and paste the `.env.example` file, which will contain all the current keys for the dotenv configuration.

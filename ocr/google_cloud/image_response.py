@@ -4,6 +4,7 @@ from config import Config
 from config.env_keys import OCR_OUTPUT_PATH
 from google.cloud.vision import AnnotateImageResponse
 from ocr.ocr_annotation import OCRAnnotation
+from util.default_file_ext import apply_default_file_ext
 
 
 def save_response_as_json(response: AnnotateImageResponse, file_name: str):
@@ -18,12 +19,7 @@ def save_response_as_json(response: AnnotateImageResponse, file_name: str):
         str: The response object represented as a JSON string
     """
     response_json = AnnotateImageResponse.to_json(response)
-    file_path = file_name
-    file_ext = os.path.splitext(file_path)[1]
-
-    # Append .json file extension if no extension given
-    if file_ext == '':
-        file_path += '.json'
+    file_path = apply_default_file_ext(file_name, '.json')
 
     # Prepend OCR_OUTPUT_PATH if the value is set
     if OCR_OUTPUT_PATH in Config.env:
