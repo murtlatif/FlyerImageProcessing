@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -31,18 +31,18 @@ class FlyerType(StringValueEnum):
 
 @dataclass
 class AdBlock:
-    product_name: str
-    product_price: float
-    unit_of_measurement: Measurement
+    product_name: str = None
+    product_price: float = None
+    unit_of_measurement: Measurement = None
 
 
 @dataclass
 class Page:
-    page_type: PageType
-    ad_blocks: list[AdBlock]
+    page_type: PageType = None
+    ad_blocks: list[AdBlock] = field(default_factory=list)
 
 
 @dataclass
 class Flyer:
-    flyer_type: FlyerType
-    pages: list[Page]
+    flyer_type: FlyerType = None
+    pages: list[Page] = field(default_factory=list)

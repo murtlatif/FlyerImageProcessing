@@ -1,6 +1,6 @@
 from .flyer_types import AdBlock, Flyer, FlyerType, Measurement, Page, PageType
 
-example_flyer = Flyer(
+EXAMPLE_FLYER = Flyer(
     flyer_type=FlyerType.WEEKLY,
     pages=[
         Page(
@@ -28,5 +28,14 @@ example_flyer = Flyer(
                 )
             ]
         )
+    ]
+)
+
+EMPTY_FLYER = Flyer()
+
+EMPTY_PAGE_FLYER = Flyer(
+    flyer_type=FlyerType.OTHER,
+    pages=[
+        Page()
     ]
 )
