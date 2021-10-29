@@ -13,3 +13,4 @@ categories = [
     "bakery",   # cakes, breads, cookies 3
     "dairy",    # butter, milk, yoghurt 4
 ]
+
