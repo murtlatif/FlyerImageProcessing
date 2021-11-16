@@ -1,7 +1,7 @@
 import json
 from dataclasses import asdict
 
-from util.default_file_ext import apply_default_file_ext
+from util.file_path_util import apply_default_file_ext
 
 from .flyer_types import Flyer
 

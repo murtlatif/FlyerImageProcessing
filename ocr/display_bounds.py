@@ -1,19 +1,17 @@
-from typing import Sequence
-
 from PIL import Image, ImageDraw, ImageFont
 from util.random_color import generate_random_color
 
-from ocr.ocr_annotation import OCRAnnotation
+from ocr.annotation_types import OCRAnnotation
 
 
-def draw_text_annotations(image_source, annotations: Sequence[OCRAnnotation]) -> None:
+def draw_text_annotations(image_source: str, annotations: list[OCRAnnotation]) -> None:
     """
     Draws a bounding box around each of the given annotations and writes the
     description of the annotation inside the box.
 
     Args:
-        image_source: The image source to draw onto
-        annotations: A list of text annotations, containing a `bounding_poly` and and a `description` field.
+        image_source (str): The image source to draw onto
+        annotations (list[OCRAnnotation]): List of annotations
     """
     image = Image.open(image_source)
     font = ImageFont.truetype('arial.ttf', 14)

@@ -35,5 +35,6 @@ class ArgparseConfig:
         pass
 
     def _add_arguments_to_parser(self, parser: ArgumentParser):
-        parser.add_argument('--img', help='File path to test image')
-        parser.add_argument('-a', '--annotations', help='File path to annotation JSON')
+        parser.add_argument('-a', '--annotations-file', help='File path to annotation JSON')
+        parser.add_argument('-i', '--image', dest='image_path', help='File path to test image')
+        parser.add_argument('-r', '--request-ocr', action='store_true', help='Request annotation from OCR service as a fall back')

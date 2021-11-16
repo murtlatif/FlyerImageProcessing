@@ -3,8 +3,8 @@ import os.path
 from config import Config
 from config.env_keys import OCR_OUTPUT_PATH
 from google.cloud.vision import AnnotateImageResponse
-from ocr.ocr_annotation import OCRAnnotation
-from util.default_file_ext import apply_default_file_ext
+from ocr.annotation_types import OCRAnnotation
+from util.file_path_util import apply_default_file_ext
 
 
 def save_response_as_json(response: AnnotateImageResponse, file_name: str):
@@ -47,6 +47,58 @@ def load_response_from_json(file_path: str) -> AnnotateImageResponse:
         response = AnnotateImageResponse.from_json(response_json)
 
     return response
+
+
+def load_response_as_ocr_annotation(file_path: str):
+    """
+    Loads a text detection response JSON file into a list of
+    OCRAnnotations.
+
+    Args:
+        file_path (str): The file path to the response JSON file
+    """
+    annotation_response = load_response_from_json(file_path)
+    ocr_annotations = response_to_ocr_annotations(annotation_response)
+
+    return ocr_annotations
+
+
+def response_to_hierarchy_annotation(response: AnnotateImageResponse):
+    """
+    Converts the response into a list of OCRAnnotations with the
+    AnnotationType selected based on the hierarchy in the response.
+
+    Args:
+        response (AnnotateImageResponse): The response to convert from
+
+    Returns:
+        list[OCRAnnotation]: The list of OCRAnnotations
+    """
+    ocr_annotations: list[OCRAnnotation] = []
+
+    for page in response.full_text_annotation.pages:
+        for block in page.blocks:
+            for paragraph in block.paragraphs:
+                for word in paragraph.words:
+                    word_text = []
+                    for symbol in word.symbols:
+                        break_type = None
+                        is_break_prefix = False
+                        if symbol.hasattr('property') and symbol.property.hasattr('detected_break'):
+                            break_type = symbol.property.detected_break.type_
+                            is_break_prefix = symbol.property.detected_break.is_prefix
+
+                        break_character = None
+                        if break_type == 1:
+                            break_character = ' '
+                        elif break_type == 4:
+                            break_character = '-'
+                        elif break_type == 5:
+                            break_character = '\n'
+
+                        if is_break_prefix:
+                            word_text.append(break_character)
+                        word_text.append(symbol.text)
 
 
 def response_to_ocr_annotations(response: AnnotateImageResponse):
