@@ -3,11 +3,12 @@ import os.path
 from config import Config
 from config.env_keys import OCR_OUTPUT_PATH
 from google.cloud.vision import AnnotateImageResponse
-from ocr.annotation_types import OCRAnnotation
+from ocr.annotation_types import Annotation, HierarchicalAnnotation
+from ocr.google_cloud.hierarchy_annotations import process_page_hierarchy
 from util.file_path_util import apply_default_file_ext
 
 
-def save_response_as_json(response: AnnotateImageResponse, file_name: str):
+def save_response_as_json(response: AnnotateImageResponse, file_name: str) -> str:
     """
     Saves a text detection response object as a JSON file.
 
@@ -49,76 +50,76 @@ def load_response_from_json(file_path: str) -> AnnotateImageResponse:
     return response
 
 
-def load_response_as_ocr_annotation(file_path: str):
+def load_response_as_flat_annotations(file_path: str) -> list[Annotation]:
     """
-    Loads a text detection response JSON file into a list of
-    OCRAnnotations.
+    Loads a text detection response JSON file into a list of Annotations.
 
     Args:
-        file_path (str): The file path to the response JSON file
+        file_path (str): File path to the response JSON file
+
+    Returns:
+        list[Annotation]: The flattened list of annotations
     """
     annotation_response = load_response_from_json(file_path)
-    ocr_annotations = response_to_ocr_annotations(annotation_response)
+    annotations = response_to_flat_annotations(annotation_response)
 
-    return ocr_annotations
+    return annotations
 
 
-def response_to_hierarchy_annotation(response: AnnotateImageResponse):
+def load_response_as_hierarchical_annotations(file_path: str) -> list[HierarchicalAnnotation]:
     """
-    Converts the response into a list of OCRAnnotations with the
-    AnnotationType selected based on the hierarchy in the response.
+    Loads a text detection response JSON file into a list of
+    HierarchicalAnnotations.
+
+    Args:
+        file_path (str): File path to the response JSON file
+
+    Returns:
+        list[HierarchicalAnnotations]: Annotations for the pages in the flyer
+    """
+    annotation_response = load_response_from_json(file_path)
+    hierarchical_annotations = response_to_hierarchical_annotations(annotation_response)
+
+    return hierarchical_annotations
+
+
+def response_to_hierarchical_annotations(response: AnnotateImageResponse) -> list[HierarchicalAnnotation]:
+    """
+    Converts the response into a list of HierarchicalAnnotations.
 
     Args:
         response (AnnotateImageResponse): The response to convert from
 
     Returns:
-        list[OCRAnnotation]: The list of OCRAnnotations
+        list[HierarchicalAnnotation]: Annotations of the pages in the response
     """
-    ocr_annotations: list[OCRAnnotation] = []
+    page_annotations: list[HierarchicalAnnotation] = []
 
     for page in response.full_text_annotation.pages:
-        for block in page.blocks:
-            for paragraph in block.paragraphs:
-                for word in paragraph.words:
-                    word_text = []
-                    for symbol in word.symbols:
-                        break_type = None
-                        is_break_prefix = False
-                        if symbol.hasattr('property') and symbol.property.hasattr('detected_break'):
-                            break_type = symbol.property.detected_break.type_
-                            is_break_prefix = symbol.property.detected_break.is_prefix
+        page_annotation = process_page_hierarchy(page)
+        page_annotations.append(page_annotation)
 
-                        break_character = None
-                        if break_type == 1:
-                            break_character = ' '
-                        elif break_type == 4:
-                            break_character = '-'
-                        elif break_type == 5:
-                            break_character = '\n'
-
-                        if is_break_prefix:
-                            word_text.append(break_character)
-                        word_text.append(symbol.text)
+    return page_annotations
 
 
-def response_to_ocr_annotations(response: AnnotateImageResponse):
+def response_to_flat_annotations(response: AnnotateImageResponse) -> list[Annotation]:
     """
-    Converts the response into a list of OCRAnnotations.
+    Converts the response into a list of Annotations.
 
     Args:
         response (AnnotateImageResponse): The response to convert from
 
     Returns:
-        list[OCRAnnotation]: The list of OCRAnnotations
+        list[Annotation]: The list of flattened annotations
     """
-    ocr_annotations: list[OCRAnnotation] = []
+    annotations: list[Annotation] = []
 
     for text_annotation in response.text_annotations:
 
-        annotation = OCRAnnotation(
+        annotation = Annotation(
             bounds=text_annotation.bounding_poly.vertices,
             text=text_annotation.description
         )
-        ocr_annotations.append(annotation)
+        annotations.append(annotation)
 
-    return ocr_annotations
+    return annotations

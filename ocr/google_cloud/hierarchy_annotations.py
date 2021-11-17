@@ -1,56 +1,157 @@
-from google.cloud.vision import Page, Block, Paragraph, Word, Symbol
-from ocr.annotation_types import OCRAnnotation
+from google.cloud.vision_v1.types import Block, Page, Paragraph, Symbol, Word
+from google.cloud.vision_v1.types.geometry import BoundingPoly
+from ocr.annotation_types import (AnnotationLevel, HierarchicalAnnotation,
+                                  Vertex)
 
 
-def process_page_hierarchy(page: Page) -> list[OCRAnnotation]:
+def process_page_hierarchy(page: Page) -> HierarchicalAnnotation:
     """
-    Converts the response into a list of OCRAnnotations with the
-    AnnotationType selected based on the hierarchy in the response.
+    Processes a page as a HierarchicalAnnotation.
 
     Args:
-        response (AnnotateImageResponse): The response to convert from
+        page (Page): Page to process
 
     Returns:
-        list[OCRAnnotation]: The list of OCRAnnotations
+        HierarchicalAnnotation: Resulting annotation
     """
-    ocr_annotations: list[OCRAnnotation] = []
+    block_annotations: list[HierarchicalAnnotation] = []
+    page_text = ''
 
     for block in page.blocks:
-        process_block_hierarchy(block)
-        for paragraph in block.paragraphs:
-            for word in paragraph.words:
-                word_text = []
-                for symbol in word.symbols:
-                    break_type = None
-                    is_break_prefix = False
-                    if symbol.hasattr('property') and symbol.property.hasattr('detected_break'):
-                        break_type = symbol.property.detected_break.type_
-                        is_break_prefix = symbol.property.detected_break.is_prefix
+        block_annotation = process_block_hierarchy(block)
+        page_text += block_annotation.text
+        block_annotations.append(block_annotation)
 
-                    break_character = None
-                    if break_type == 1:
-                        break_character = ' '
-                    elif break_type == 4:
-                        break_character = '-'
-                    elif break_type == 5:
-                        break_character = '\n'
+    vertices = bounding_poly_to_vertex_list(page.bounding_box)
+    page_annotation = HierarchicalAnnotation(bounds=vertices, text=page_text,
+                                             annotation_level=AnnotationLevel.PAGE, child_annotations=block_annotations)
 
-                    if is_break_prefix:
-                        word_text.append(break_character)
-                    word_text.append(symbol.text)
+    return page_annotation
 
 
-def process_block_hierarchy(block: Block) -> list[OCRAnnotation]:
-    pass
+def process_block_hierarchy(block: Block) -> HierarchicalAnnotation:
+    """
+    Processes a block as a HierarchicalAnnotation.
+
+    Args:
+        block (Block): Block to process
+
+    Returns:
+        HierarchicalAnnotation: Resulting annotation
+    """
+    paragraph_annotations: list[HierarchicalAnnotation] = []
+    block_text = ''
+
+    for paragraph in block.paragraphs:
+        paragraph_annotation = process_paragraph_hierarchy(paragraph)
+        block_text += paragraph_annotation.text
+        paragraph_annotations.append(paragraph_annotation)
+
+    vertices = bounding_poly_to_vertex_list(block.bounding_box)
+    block_annotation = HierarchicalAnnotation(bounds=vertices, text=block_text,
+                                              annotation_level=AnnotationLevel.BLOCK, child_annotations=paragraph_annotations)
+
+    return block_annotation
 
 
-def process_paragraph_hierarchy(paragraph: Paragraph) -> list[OCRAnnotation]:
-    pass
+def process_paragraph_hierarchy(paragraph: Paragraph) -> HierarchicalAnnotation:
+    """
+    Processes a paragraph as a HierarchicalAnnotation.
+
+    Args:
+        paragraph (Paragraph): Paragraph to process
+
+    Returns:
+        HierarchicalAnnotation: Resulting annotation
+    """
+    word_annotations: list[HierarchicalAnnotation] = []
+    paragraph_text = ''
+
+    for word in paragraph.words:
+        word_annotation = process_word_hierarchy(word)
+        paragraph_text += word_annotation.text
+        word_annotations.append(word_annotation)
+
+    vertices = bounding_poly_to_vertex_list(paragraph.bounding_box)
+    paragraph_annotation = HierarchicalAnnotation(bounds=vertices, text=paragraph_text,
+                                                  annotation_level=AnnotationLevel.PARA, child_annotations=word_annotations)
+
+    return paragraph_annotation
 
 
-def process_word_hierarchy(word: Word) -> list[OCRAnnotation]:
-    pass
+def process_word_hierarchy(word: Word) -> list[HierarchicalAnnotation]:
+    """
+    Processes a word as a HierarchicalAnnotation.
+
+    Args:
+        word (Word): Word to process
+
+    Returns:
+        HierarchicalAnnotation: Resulting annotation
+    """
+    symbol_annotations: list[HierarchicalAnnotation] = []
+    word_text = ''
+
+    for symbol in word.symbols:
+        symbol_annotation = process_symbol_hierarchy(symbol)
+        word_text += symbol_annotation.text
+        symbol_annotations.append(symbol_annotation)
+
+    vertices = bounding_poly_to_vertex_list(word.bounding_box)
+    word_annotation = HierarchicalAnnotation(bounds=vertices, text=word_text,
+                                             annotation_level=AnnotationLevel.WORD, child_annotations=symbol_annotations)
+
+    return word_annotation
 
 
-def process_symbol_hierarchy(symbol: Symbol) -> list[OCRAnnotation]:
-    pass
+def process_symbol_hierarchy(symbol: Symbol) -> HierarchicalAnnotation:
+    """
+    Processes a symbol as a HierarchicalAnnotation.
+
+    Args:
+        symbol (Symbol): Symbol to process
+
+    Returns:
+        HierarchicalAnnotation: Resulting annotation
+    """
+    symbol_text = symbol.text
+    break_character = ''
+    is_break_prefix = False
+
+    if hasattr(symbol, 'property') and hasattr(symbol.property, 'detected_break'):
+        detected_break = symbol.property.detected_break
+        break_type = detected_break.type_
+        is_break_prefix = detected_break.is_prefix
+
+        if break_type == 4:
+            break_character = '-'
+        elif break_type == 5:
+            break_character = '\n'
+        else:
+            break_character = ' '
+
+    if len(break_character) > 0:
+        if is_break_prefix:
+            symbol_text = break_character + symbol_text
+        else:
+            symbol_text = symbol_text + break_character
+
+    vertices = bounding_poly_to_vertex_list(symbol.bounding_box)
+    symbol_annotation = HierarchicalAnnotation(
+        bounds=vertices, text=symbol.text, annotation_level=AnnotationLevel.SYMBOL)
+
+    return symbol_annotation
+
+
+def bounding_poly_to_vertex_list(bounding_poly: BoundingPoly) -> list[Vertex]:
+    """
+    Converts a BoundingPoly object to a list of vertices
+
+    Args:
+        bounding_poly (BoundingPoly): The object to convert
+
+    Returns:
+        list[Vertex]: The list of vertices
+    """
+    vertices = [Vertex.from_dict(vertex) for vertex in bounding_poly.vertices]
+    return vertices

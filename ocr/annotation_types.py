@@ -1,8 +1,10 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
+from dataclasses import dataclass, field
 from enum import Enum
 
 
-class AnnotationType(Enum):
+class AnnotationLevel(Enum):
     PAGE = 1
     BLOCK = 2
     PARA = 3
@@ -12,12 +14,21 @@ class AnnotationType(Enum):
 
 @dataclass
 class Vertex:
-    x: tuple[int, int]
-    y: tuple[int, int]
+    x: int
+    y: int
+
+    @staticmethod
+    def from_dict(vertex_dict: dict[str, int]) -> Vertex:
+        return Vertex(x=vertex_dict.x, y=vertex_dict.y)
 
 
 @dataclass
-class OCRAnnotation:
+class Annotation:
     bounds: list[Vertex]
     text: str
-    annotation_type: AnnotationType = None
+
+
+@dataclass
+class HierarchicalAnnotation(Annotation):
+    annotation_level: AnnotationLevel = None
+    child_annotations: list[Annotation] = field(default_factory=list)
