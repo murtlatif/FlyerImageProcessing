@@ -3,15 +3,17 @@ import os.path
 from config import Config
 from flyer.flyer_types import Flyer
 from flyer.marshal_flyer import marshal_flyer
+from util.constants import ANNOTATION_LEVEL_COLORS
 from util.file_path_util import get_file_name_without_ext
 
-from .annotation_types import Annotation
+from .annotation_types import Annotation, AnnotationLevel
+from .display_bounds import (draw_flat_annotations,
+                             draw_hierarchical_annotations)
 from .get_annotations import get_text_annotations
 from .google_cloud.annotation_response import (
     load_response_from_json, response_to_flat_annotations,
     response_to_hierarchical_annotations)
 from .ocr_segmentation import segment_page
-from .display_bounds import draw_flat_annotations, draw_hierarchical_annotations, draw_text_annotations
 
 
 def draw_annotations_on_image(
@@ -79,7 +81,10 @@ def ocr_main():
         hierarchical=True
     )
 
-    draw_hierarchical_annotations(image_path, hierarchical_annotations)
+    # print(hierarchical_annotations)
+
+    draw_hierarchical_annotations(image_path, hierarchical_annotations, annotation_level_whitelist={
+                                  AnnotationLevel.PAGE, AnnotationLevel.PARA, AnnotationLevel.BLOCK, AnnotationLevel.WORD})
     # segment_with_ocr(page_annotations)
     # ocr_main(hierarchical_annotations)
 

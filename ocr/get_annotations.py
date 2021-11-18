@@ -4,7 +4,7 @@ from .annotation_types import Annotation
 from .google_cloud import google_cloud_client
 from .google_cloud.annotation_response import (
     load_response_from_json, response_to_flat_annotations,
-    response_to_hierarchy_annotations, save_response_as_json)
+    response_to_hierarchical_annotations, save_response_as_json)
 
 
 def get_text_annotations(
@@ -40,7 +40,7 @@ def get_text_annotations(
         response = load_response_from_json(annotation_json_path)
 
         if hierarchical:
-            annotations = response_to_hierarchy_annotations(response)
+            annotations = response_to_hierarchical_annotations(response)
         else:
             annotations = response_to_flat_annotations(response)
 
@@ -53,14 +53,14 @@ def get_text_annotations(
     return annotations
 
 
-def request_text_annotations(file_image_path: str, save_file_name: str = None, hierarchical: bool = True) -> list[Annotation]:
+def request_text_annotations(file_image_path: str, save_file: str = None, hierarchical: bool = True) -> list[Annotation]:
     """
     Requests text annotations from Google Cloud and saves the data as a JSON
     file. If no save_file_name is given, the file_image_path is used instead.
 
     Args:
         file_image_path (str): The path to the image to annotate
-        save_file_name (str, optional): The file name to save the annotation data as. Defaults to the image file name.
+        save_file (str, optional): The file name to save the annotation data as. Defaults to the image file name.
         hierarchical (bool, optional): Whether to get the hierarchical annotations. Will get flat annotations if False. Defaults to True.
 
     Returns:
@@ -68,14 +68,14 @@ def request_text_annotations(file_image_path: str, save_file_name: str = None, h
     """
     annotation_response = google_cloud_client.request_text_detection(file_image_path)
 
-    if save_file_name is None:
-        save_file_name = file_image_path
+    if save_file is None:
+        save_file = file_image_path
 
-    save_file_name = get_file_name_without_ext(save_file_name)
-    save_response_as_json(annotation_response, save_file_name)
+    save_file = get_file_name_without_ext(save_file)
+    save_response_as_json(annotation_response, save_file)
 
     if hierarchical:
-        annotations = response_to_hierarchy_annotations(annotation_response)
+        annotations = response_to_hierarchical_annotations(annotation_response)
     else:
         annotations = response_to_flat_annotations(annotation_response)
 

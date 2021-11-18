@@ -16,3 +16,6 @@ venv/
 
 # Executables
 *.exe
+
+# Private Keys
+DaisyFlyerKey.json

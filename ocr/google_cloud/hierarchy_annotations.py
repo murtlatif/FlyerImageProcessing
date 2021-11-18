@@ -22,7 +22,13 @@ def process_page_hierarchy(page: Page) -> HierarchicalAnnotation:
         page_text += block_annotation.text
         block_annotations.append(block_annotation)
 
-    vertices = bounding_poly_to_vertex_list(page.bounding_box)
+    # Pages don't have bounds, use (0, 0) and (width, height) as corners
+    vertices = [
+        Vertex(0, 0),
+        Vertex(page.width, 0),
+        Vertex(page.width, page.height),
+        Vertex(0, page.height),
+    ]
     page_annotation = HierarchicalAnnotation(bounds=vertices, text=page_text,
                                              annotation_level=AnnotationLevel.PAGE, child_annotations=block_annotations)
 
@@ -115,20 +121,18 @@ def process_symbol_hierarchy(symbol: Symbol) -> HierarchicalAnnotation:
         HierarchicalAnnotation: Resulting annotation
     """
     symbol_text = symbol.text
+    detected_break = symbol.property.detected_break
+    break_type = detected_break.type_
+    is_break_prefix = detected_break.is_prefix
+
     break_character = ''
-    is_break_prefix = False
 
-    if hasattr(symbol, 'property') and hasattr(symbol.property, 'detected_break'):
-        detected_break = symbol.property.detected_break
-        break_type = detected_break.type_
-        is_break_prefix = detected_break.is_prefix
-
-        if break_type == 4:
-            break_character = '-'
-        elif break_type == 5:
-            break_character = '\n'
-        else:
-            break_character = ' '
+    if break_type == 4:
+        break_character = '-'
+    elif break_type == 5:
+        break_character = '\n'
+    elif break_type > 0:
+        break_character = ' '
 
     if len(break_character) > 0:
         if is_break_prefix:
@@ -138,7 +142,7 @@ def process_symbol_hierarchy(symbol: Symbol) -> HierarchicalAnnotation:
 
     vertices = bounding_poly_to_vertex_list(symbol.bounding_box)
     symbol_annotation = HierarchicalAnnotation(
-        bounds=vertices, text=symbol.text, annotation_level=AnnotationLevel.SYMBOL)
+        bounds=vertices, text=symbol_text, annotation_level=AnnotationLevel.SYMBOL)
 
     return symbol_annotation
 

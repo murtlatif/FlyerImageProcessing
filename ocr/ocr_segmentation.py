@@ -1,7 +1,6 @@
-from FlyerImageProcessing.ocr.annotation_types import HierarchicalAnnotation
 from flyer.flyer_types import Page
 
-from ocr.annotation_types import Annotation
+from .annotation_types import Annotation, HierarchicalAnnotation
 
 
 def tokenize(text: str):
