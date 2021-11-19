@@ -1,44 +1,10 @@
 import re
 
-from flyer.flyer_components import (AdBlock, AdBlockComponent,
-                                    AdBlockComponentType, Measurement,
-                                    PriceUnit, Promotion, PromotionType,
-                                    Quantity)
+from flyer.flyer_components import (AdBlockComponent, AdBlockComponentType,
+                                    Measurement, PriceUnit, Promotion,
+                                    PromotionType, Quantity)
 
 from .annotation_types import HierarchicalAnnotation
-
-
-def ad_block_from_block_annotation(block_annotation: HierarchicalAnnotation) -> 'AdBlock | None':
-    """
-    Compiles an AdBlock object using the information found in the block
-    annotation.
-
-    Args:
-        block_annotation (HierarchicalAnnotation): Block to compile
-
-    Returns:
-        AdBlock | None: Ad block if a price was found, otherwise None
-    """
-    # Identify the product price
-    product_price = find_price_in_text(block_annotation.text)
-
-    # TODO: Identify the product name
-    product_name = block_annotation.text.split(' ')[0]
-
-    # Identify the product quantity
-    quantity = find_quantity_in_text(block_annotation.text)
-
-    if product_price is None and quantity is None:
-        return None
-
-    ad_block = AdBlock(
-        product_name=product_name,
-        product_price=product_price,
-        quantity=quantity,
-        vertices=block_annotation.bounds
-    )
-
-    return ad_block
 
 
 def extract_component_from_block(block_annotation: HierarchicalAnnotation) -> AdBlockComponent:
@@ -110,6 +76,8 @@ def find_price_in_text(text: str) -> 'int | None':
     Returns:
         int | None: Extracted price, or None if no price was found
     """
+    text = text.replace('\\n', '')
+
     price_regex_pattern = r'\$?(\d+(,\d+)*(\.\d+)?)\$?'
     price_regex_match = re.search(price_regex_pattern, text)
     if price_regex_match is None:
@@ -125,6 +93,10 @@ def find_price_in_text(text: str) -> 'int | None':
         price = int(stripped_price_string)
     except ValueError:
         print(f'Failed to convert price "{stripped_price_string}" to int.')
+
+    # Only consider prices at $0.99 or higher to be valid
+    if price < 99:
+        return None
 
     return price
 
@@ -206,7 +178,7 @@ def find_promotion_in_text(text: str) -> 'Promotion | None':
 
 
 def find_price_unit_in_text(text: str) -> 'PriceUnit | None':
-    processed_text = text.lower().strip()
+    processed_text = text.replace(r'\n', '').lower().strip()
 
     if processed_text in {'ea', 'each'}:
         return PriceUnit.EACH
@@ -216,7 +188,7 @@ def find_price_unit_in_text(text: str) -> 'PriceUnit | None':
 
 
 def is_text_product_description(text: str) -> bool:
-    has_many_words = len(text.split()) > 4
+    has_many_words = len(text.split()) > 6
     has_alphabet = not text.isnumeric()
 
     if has_many_words and has_alphabet:
@@ -225,8 +197,8 @@ def is_text_product_description(text: str) -> bool:
 
 def is_text_product_name(text: str) -> bool:
     is_title_cased = (text.replace('\'', '').istitle() or text.isupper()) and not text.isnumeric()
-    has_few_words = len(text.split()) < 4
-    is_long_enough = len(text) > 3
+    has_few_words = len(text.split()) <= 6
+    is_long_enough = len(text) > 4
 
     if is_title_cased and has_few_words and is_long_enough:
         return True

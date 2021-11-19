@@ -26,6 +26,11 @@ def distance_between_regions(region: Region, other_region: Region) -> float:
     return polygon.distance(other_polygon)
 
 
+def get_region_area(region: Region) -> float:
+    polygon = _region_to_polygon(region)
+    return polygon.area
+
+
 def is_vertex_in_region(region: Region, target_vertex: Vertex) -> bool:
     """
     Uses Shapely to determine if a vertex is inside a given region.

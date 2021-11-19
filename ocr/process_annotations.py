@@ -5,7 +5,7 @@ from ocr.get_annotations import find_annotations_in_region
 from flyer.flyer_components import (AdBlock, AdBlockComponent,
                                     AdBlockComponentType, Flyer, FlyerType,
                                     Page, PageType, Product)
-from util.image_space import Vertex, distance_between_regions, Region
+from util.image_space import Vertex, distance_between_regions, Region, get_region_area
 
 from .annotation_types import HierarchicalAnnotation
 from .ocr_flyer_analysis import extract_component_from_block
@@ -79,7 +79,7 @@ def process_segmented_page_annotation(page_annotation: HierarchicalAnnotation, p
             ad_block_component = extract_component_from_block(block_annotation)
             ad_block_components[ad_block_component.component_type].append(ad_block_component)
 
-        ad_block = construct_segmented_block_from_components(ad_block_components)
+        ad_block = construct_segmented_block_from_components(ad_block_components, segment_bounds)
         ad_blocks.append(ad_block)
 
     page_type = PageType.MULTI_AD if len(ad_blocks) > 1 else PageType.OTHER
@@ -88,24 +88,56 @@ def process_segmented_page_annotation(page_annotation: HierarchicalAnnotation, p
     return page
 
 
-def construct_segmented_block_from_components(components: defaultdict[AdBlockComponentType, list[AdBlockComponent]]) -> AdBlock:
+def construct_segmented_block_from_components(components: defaultdict[AdBlockComponentType, list[AdBlockComponent]], ad_block_bounds: Region) -> AdBlock:
 
     product_names = components[AdBlockComponentType.PRODUCT_NAME]
-    product_prices = components[AdBlockComponentType.PRODUCT_DESCRIPTION]
+    product_descriptions = components[AdBlockComponentType.PRODUCT_DESCRIPTION]
     product_prices = components[AdBlockComponentType.PRODUCT_PRICE]
-    product_prices = components[AdBlockComponentType.QUANTITY]
+    product_price_units = components[AdBlockComponentType.PRODUCT_PRICE_UNIT]
+    quantities = components[AdBlockComponentType.QUANTITY]
+    promotions = components[AdBlockComponentType.PROMOTION]
 
+    extra_components: list[AdBlockComponent] = []
+
+    # TODO: Improve how to merge these components if find multiple!
+    product_name = None
     if len(product_names) > 0:
-        product_name = _get_component_value(product_names[0])
+        biggest_name_component, remaining_components = get_biggest_component(product_names)
+        product_name = _get_component_value(biggest_name_component)
 
+        # Convert the remaining product names to product descriptions
+        product_descriptions.extend(remaining_components)
+
+    description_values = [
+        _get_component_value(description_component)
+        for description_component in product_descriptions
+        if _get_component_value(description_component) is not None
+    ]
+
+    product_description = None
+    if len(description_values) > 0:
+        product_description = ''.join(description_values)
+
+    product_price = None
     if len(product_prices) > 0:
-        product_price = _get_component_value(product_prices[0])
+        biggest_price_component, remaining_components = get_biggest_component(product_prices)
+        product_price = _get_component_value(biggest_price_component)
+        extra_components.extend(remaining_components)
 
-    # TODO: CONTINUE FIXING THIS!
-    product_description = _get_component_value(nearest_components[AdBlockComponentType.PRODUCT_DESCRIPTION])
-    product_price = _get_component_value(price_component)
-    product_price_unit = _get_component_value(nearest_components[AdBlockComponentType.PRODUCT_PRICE_UNIT])
-    quantity = _get_component_value(nearest_components[AdBlockComponentType.QUANTITY])
+    product_price_unit = None
+    if len(product_price_units) > 0:
+        product_price_unit = _get_component_value(product_price_units[0])
+        extra_components.extend(product_price_units[1:])
+
+    quantity = None
+    if len(quantities) > 0:
+        quantity = _get_component_value(quantities[0])
+        extra_components.extend(quantities[1:])
+
+    promotion = None
+    if len(promotions) > 0:
+        promotion = _get_component_value(promotions[0])
+        extra_components.extend(promotions[1:])
 
     product = Product(
         name=product_name,
@@ -115,13 +147,9 @@ def construct_segmented_block_from_components(components: defaultdict[AdBlockCom
         quantity=quantity
     )
 
-    promotion = _get_component_value(nearest_components[AdBlockComponentType.PROMOTION])
+    additional_data = list(map(lambda component: str(component), extra_components))
 
-    bounding_components = [price_component] + \
-        [component for component in nearest_components.values() if component is not None]
-    ad_block_bounds = get_component_group_bounds(bounding_components)
-    ad_block = AdBlock(product=product, promotion=promotion, bounds=ad_block_bounds)
-    ad_block.append(ad_block)
+    ad_block = AdBlock(product=product, promotion=promotion, bounds=ad_block_bounds, additional_data=additional_data)
 
     return ad_block
 
@@ -210,6 +238,28 @@ def get_component_group_bounds(components: list[AdBlockComponent]) -> Region:
     ]
 
     return group_bounds
+
+
+def get_biggest_component(components: list[AdBlockComponent]) -> tuple[AdBlockComponent, list[AdBlockComponent]]:
+    biggest_component_idx = None
+    biggest_component_size = 0
+    for component_idx in range(len(components)):
+        component = components[component_idx]
+        if component is None or component.value is None:
+            continue
+
+        component_area = get_region_area(component.bounds)
+        if component_area > biggest_component_size:
+            biggest_component_size = component_area
+            biggest_component_idx = component_idx
+
+    if biggest_component_idx is None:
+        return None, components
+
+    biggest_component = components[biggest_component_idx]
+    remaining_components = components[:biggest_component_idx] + components[biggest_component_idx+1:]
+
+    return biggest_component, remaining_components
 
 
 def _get_component_value(component: 'AdBlockComponent | None') -> Any:

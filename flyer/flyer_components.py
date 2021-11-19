@@ -99,6 +99,7 @@ class AdBlock:
     product: Product = field(default_factory=Product)
     promotion: Promotion = None
     bounds: Region = field(default_factory=list)
+    additional_data: str = None
 
 
 @dataclass
