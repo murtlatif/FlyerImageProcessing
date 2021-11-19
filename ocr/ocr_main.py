@@ -1,16 +1,21 @@
+import os.path
+
 from config import Config
+from flyer.flyer_components import Flyer
 from flyer.marshal_flyer import marshal_flyer
-from util.constants import ANNOTATION_LEVEL_COLORS
+from Segmentation.GetBoxes import get_segmented_boxes
+from util.constants import ANNOTATION_LEVEL_COLORS, COMMAND
 from util.file_path_util import get_file_name_without_ext
 
-from .annotation_types import AnnotationLevel
+from .annotation_types import AnnotationLevel, HierarchicalAnnotation
 from .display_bounds import (draw_ad_blocks, draw_flat_annotations,
                              draw_hierarchical_annotations)
-from .get_annotations import get_text_annotations
+from .get_annotations import find_annotations_in_region, get_text_annotations
 from .google_cloud.annotation_response import (
     load_response_from_json, response_to_flat_annotations,
     response_to_hierarchical_annotations)
-from .process_annotations import process_flyer_annotation
+from .process_annotations import (process_flyer_annotation,
+                                  process_segmented_flyer_annotations)
 
 
 def draw_annotations_on_image(
@@ -56,8 +61,36 @@ def draw_annotations_on_image(
     bounded_image.save(f'bounded_{image_file_without_extension}.png')
 
 
+def save_flyer(flyer: Flyer, file_path: str) -> None:
+    marshal_flyer(flyer, file_path=file_path)
+
+
+def draw_flyer_ad_blocks(flyer: Flyer, image_path: 'str | None') -> None:
+    draw_ad_blocks(image_path, flyer.pages[0].ad_blocks)
+
+
+def process_flyer(hierarchical_annotations: list[HierarchicalAnnotation]) -> Flyer:
+    flyer = process_flyer_annotation(hierarchical_annotations)
+    return flyer
+
+
+def process_segmented_flyer(
+    hierarchical_annotations: list[HierarchicalAnnotation],
+    image_path: str,
+    model_state_file: str,
+) -> Flyer:
+    image_file_name = os.path.basename(image_path)
+    image_path_directory = os.path.dirname(image_path)
+    segmented_boxes = get_segmented_boxes(image_file_name, model_state_file, image_path_directory)
+
+    flyer = process_segmented_flyer_annotations(hierarchical_annotations, [segmented_boxes])
+    return flyer
+
+
 def ocr_main():
     image_path = Config.args.image_path
+    model_state_file = Config.args.model_state
+    annotation_file = Config.args.annotations_file
 
     hierarchical_annotations = get_text_annotations(
         annotation_json_path=Config.args.annotations_file,
@@ -66,32 +99,35 @@ def ocr_main():
         hierarchical=True
     )
 
-    # print(hierarchical_annotations)
+    command = Config.args.command
 
-    # draw_hierarchical_annotations(image_path, hierarchical_annotations, annotation_level_whitelist={
-    #                               AnnotationLevel.PAGE, AnnotationLevel.BLOCK})
+    if command == COMMAND.ANNOTATIONS:
+        if Config.args.display:
+            draw_hierarchical_annotations(image_path, hierarchical_annotations, annotation_level_whitelist={
+                AnnotationLevel.PAGE, AnnotationLevel.BLOCK})
+        else:
+            print(hierarchical_annotations)
 
-    flyer = process_flyer_annotation(hierarchical_annotations)
-    file_name = get_file_name_without_ext(Config.args.image_path or Config.args.annotations_file or 'UnnamedFlyer')
-    marshal_flyer(flyer, file_path=file_name)
+    if command == COMMAND.FLYER:
+        flyer = process_flyer(hierarchical_annotations)
+        if Config.args.save:
+            save_file_name = get_file_name_without_ext(annotation_file or image_path or 'UnnamedFlyer')
+            save_flyer(flyer, file_path=save_file_name)
 
-    draw_ad_blocks(image_path, flyer.pages[0].ad_blocks)
-    # segment_with_ocr(page_annotations)
-    # ocr_main(hierarchical_annotations)
+        if Config.args.display:
+            draw_flyer_ad_blocks(flyer, image_path)
+
+    if command == COMMAND.SEGMENTATION:
+        flyer = process_segmented_flyer(hierarchical_annotations, image_path, model_state_file)
+        if Config.args.save:
+
+            save_file_name = get_file_name_without_ext(annotation_file or image_path or 'UnnamedFlyer')
+            save_flyer(flyer, file_path=f'{save_file_name}_segmented')
+
+        if Config.args.display:
+            draw_flyer_ad_blocks(flyer, image_path)
 
 
 if __name__ == '__main__':
 
-    image_path = Config.args.image_path
-    annotation_json_path = Config.args.annotations_file
-
-    hierarchical_annotations = get_text_annotations(
-        annotation_json_path=Config.args.annotations_file,
-        file_image_path=Config.args.image_path,
-        request_as_fallback=Config.args.request_ocr,
-        hierarchical=True
-    )
-
-    draw_hierarchical_annotations(image_path, hierarchical_annotations)
-    # segment_with_ocr(page_annotations)
-    # ocr_main(hierarchical_annotations)
+    ocr_main()

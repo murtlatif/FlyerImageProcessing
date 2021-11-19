@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any
 
-from util.image_space import Vertex
+from util.image_space import Region
 
 
 class StringValueEnum(str, Enum):
@@ -32,6 +32,11 @@ class Measurement(StringValueEnum):
         return measurements
 
 
+class PriceUnit(StringValueEnum):
+    EACH = 'each'
+    PACKAGE = 'pkg'
+
+
 class PageType(StringValueEnum):
     MULTI_AD = 'multi-ad'
     OTHER = 'other'
@@ -45,9 +50,9 @@ class FlyerType(StringValueEnum):
 class PromotionType(StringValueEnum):
     PERCENTAGE = 'percentage'
     FLAT = 'flat'
-    BUY_N_GET_ONE_FREE = 'buy_N_get_one_free'
-    BUY_ONE_GET_N_PERCENT_OFF = 'buy_one_get_N_percent_off'
-    BUY_ONE_GET_N_AMOUNT_OFF = 'buy_one_get_N_amount_off'
+    BUY_N_GET_ONE_FREE = 'buy-N-get-one-free'
+    BUY_ONE_GET_N_PERCENT_OFF = 'buy-one-get-N-percent-off'
+    BUY_ONE_GET_N_AMOUNT_OFF = 'buy-one-get-N-amount-off'
 
 
 class AdBlockComponentType(Enum):
@@ -55,6 +60,7 @@ class AdBlockComponentType(Enum):
     PRODUCT_NAME = auto()
     PRODUCT_DESCRIPTION = auto()
     PRODUCT_PRICE = auto()
+    PRODUCT_PRICE_UNIT = auto()
     QUANTITY = auto()
     PROMOTION = auto()
 
@@ -63,7 +69,7 @@ class AdBlockComponentType(Enum):
 class AdBlockComponent:
     component_type: AdBlockComponentType
     value: Any
-    bounds: list[Vertex]
+    bounds: Region
 
 
 @dataclass
@@ -84,6 +90,7 @@ class Product:
     name: str = None
     description: str = None
     price: int = None
+    price_unit: PriceUnit = None
     quantity: Quantity = field(default_factory=Quantity)
 
 
@@ -91,7 +98,7 @@ class Product:
 class AdBlock:
     product: Product = field(default_factory=Product)
     promotion: Promotion = None
-    bounds: list[Vertex] = field(default_factory=list)
+    bounds: Region = field(default_factory=list)
 
 
 @dataclass

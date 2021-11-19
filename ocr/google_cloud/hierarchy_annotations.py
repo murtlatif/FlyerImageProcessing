@@ -1,7 +1,7 @@
 from google.cloud.vision_v1.types import Block, Page, Paragraph, Symbol, Word
 from google.cloud.vision_v1.types.geometry import BoundingPoly
-from ocr.annotation_types import (AnnotationLevel, HierarchicalAnnotation,
-                                  Vertex)
+from ocr.annotation_types import AnnotationLevel, HierarchicalAnnotation
+from util.image_space import Vertex, Region
 
 
 def process_page_hierarchy(page: Page) -> HierarchicalAnnotation:
@@ -147,7 +147,7 @@ def process_symbol_hierarchy(symbol: Symbol) -> HierarchicalAnnotation:
     return symbol_annotation
 
 
-def bounding_poly_to_vertex_list(bounding_poly: BoundingPoly) -> list[Vertex]:
+def bounding_poly_to_vertex_list(bounding_poly: BoundingPoly) -> Region:
     """
     Converts a BoundingPoly object to a list of vertices
 
@@ -155,7 +155,7 @@ def bounding_poly_to_vertex_list(bounding_poly: BoundingPoly) -> list[Vertex]:
         bounding_poly (BoundingPoly): The object to convert
 
     Returns:
-        list[Vertex]: The list of vertices
+        Region: The list of vertices
     """
     vertices = [Vertex.from_dict(vertex) for vertex in bounding_poly.vertices]
     return vertices

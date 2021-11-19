@@ -1,26 +1,28 @@
-import pycocotools
-import os
+
+from collections import defaultdict
+
 import numpy as np
 import torch
 import torch.utils.data
-from PIL import Image, ImageDraw
-import pandas as pd
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from engine import train_one_epoch, evaluate
-from RaccoonDataset import RaccoonDataset
-import utils
-import transforms as T
 import torchvision
+from PIL import Image, ImageDraw
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from util.image_space import Region, Vertex
+
+from . import transforms as T
+from .RaccoonDataset import RaccoonDataset
+
 
 def get_transform(train):
-   transforms = []
-   # converts the image, a PIL image, into a PyTorch Tensor
-   transforms.append(T.ToTensor())
-   if train:
+    transforms = []
+    # converts the image, a PIL image, into a PyTorch Tensor
+    transforms.append(T.ToTensor())
+    if train:
         # during training, randomly flip the training images
         # and ground-truth for data augmentation
         transforms.append(T.RandomHorizontalFlip(0.5))
-   return T.Compose(transforms)
+    return T.Compose(transforms)
+
 
 class GetBoxes():
     def __init__(self, num_classes, model_file, device, data_folder):
@@ -42,44 +44,59 @@ class GetBoxes():
         self.model.to(self.device)
 
     def getData(self):
-        self.dataset = RaccoonDataset(root=self.data_folder, data_file=None, transforms = get_transform(train=False))
+        self.dataset = RaccoonDataset(root=self.data_folder, data_file=None, transforms=get_transform(train=False))
         print(len(self.dataset))
 
-
-    def getBoxes(self, img_folder):
+    def getBoxes(self):
+        self.boxes_dict: defaultdict[str, list[Region]] = defaultdict(list)
         for i in range(0, len(self.dataset)):
-            self.boxes_dict = {}
             img, target = self.dataset[i]
 
-            #put the model in evaluation mode and get boxes
+            # put the model in evaluation mode and get boxes
             self.model.eval()
             with torch.no_grad():
-                prediction = self.model([img.to(device)])
+                prediction = self.model([img.to(self.device)])
 
             # Get the image and initialize drawing
-            image = Image.fromarray(img.mul(255).permute(1, 2,0).byte().numpy())
+            image = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
             draw = ImageDraw.Draw(image)
             name = target["name"]
-            # get ready to store a list of lists where the sublists are vertices for one box
-            self.boxes_dict[name] = []
+
             # Go through all boxes the model predicted
             for element in range(len(prediction[0]["boxes"])):
-                boxes = prediction[0]["boxes"][element].cpu().numpy()
-                score = np.round(prediction[0]["scores"][element].cpu().numpy(),decimals= 4)
+                boxes = prediction[0]["boxes"][element].cpu().numpy().astype(int)
+                score = np.round(prediction[0]["scores"][element].cpu().numpy(), decimals=4)
                 # Only select boxes the model is confident about
                 if score > 0.8:
-                    self.boxes_dict[name] += [[(boxes[0], boxes[1]), (boxes[2], boxes[1]), (boxes[0], boxes[3]), (boxes[2], boxes[3])]]
-                    draw.rectangle([(boxes[0], boxes[1]), (boxes[2], boxes[3])], outline ="red", width =3)
-                    draw.text((boxes[0], boxes[1]), text = str(score))
-                    
+                    # top-left, top-right, bottom-right, bottom-left
+                    left, up, right, down = boxes[0], boxes[1], boxes[2], boxes[3]
+                    box = [
+                        Vertex(left, up),
+                        Vertex(right, up),
+                        Vertex(left, down),
+                        Vertex(right, down),
+                    ]
+                    self.boxes_dict[name].append(box)
+
+                    draw.rectangle([(boxes[0], boxes[1]), (boxes[2], boxes[3])], outline="red", width=3)
+                    draw.text((boxes[0], boxes[1]), text=str(score))
+
             # Uncomment if you want to see how the model is doing
             # image.save('things/test_{}.png'.format(i))
-    
-    def retBoxes(self):
+
+    def retBoxes(self, name):
         return self.boxes_dict[name]
+
 
 # Example use
 # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-# getboxes = GetBoxes(2, 'models/mymodel', device, '/home/stephen/Segmentation/test')
-# getboxes.getBoxes('test')
+# getboxes = GetBoxes(2, 'models/mymodelcpu', device, 'sample_data')
+# getboxes.getBoxes()
 # print(getboxes.boxes_dict)
+
+
+def get_segmented_boxes(image_file: str, model_state_file: str, data_folder: str) -> list[Region]:
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    box_getter = GetBoxes(2, model_state_file, device, data_folder)
+    box_getter.getBoxes()
+    return box_getter.retBoxes(image_file)

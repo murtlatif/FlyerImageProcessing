@@ -1,5 +1,5 @@
 from util.file_path_util import get_file_name_without_ext
-from util.image_space import Vertex, does_region_intersect
+from util.image_space import Region, does_region_intersect
 
 from .annotation_types import Annotation
 from .google_cloud import google_cloud_client
@@ -85,7 +85,7 @@ def request_text_annotations(file_image_path: str, save_file: str = None, hierar
 
 def find_annotations_in_region(
     annotations: list[Annotation],
-    region_vertices: list[Vertex],
+    region_vertices: Region,
 ) -> list[Annotation]:
     """
     Filters the list of annotations to all of the annotations that
@@ -93,7 +93,7 @@ def find_annotations_in_region(
 
     Args:
         annotations (list[Annotation]): Annotations to filter
-        region_vertices (list[Vertex]): Region to intersect
+        region_vertices (Region): Region to intersect
 
     Returns:
         list[Annotation]: Annotations that intersect with the region

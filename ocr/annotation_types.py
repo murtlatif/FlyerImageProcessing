@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from util.image_space import Vertex
+from util.image_space import Region
 
 
 class AnnotationLevel(Enum):
@@ -15,7 +15,7 @@ class AnnotationLevel(Enum):
 
 @dataclass
 class Annotation:
-    bounds: list[Vertex]
+    bounds: Region
     text: str
 
 

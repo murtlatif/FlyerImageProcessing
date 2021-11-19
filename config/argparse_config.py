@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+from util.constants import COMMAND
 
 
 class ArgparseConfig:
@@ -32,9 +33,29 @@ class ArgparseConfig:
         return self._args
 
     def _validate_args(self):
-        pass
+        can_get_annotations = (self._args.annotations_file is not None) or (
+            self._args.image_path is not None and self._args.request_ocr)
+
+        can_show_image = self._args.image_path is not None
+
+        assert can_get_annotations
+
+        if self._args.display:
+            assert can_show_image
+
+        if self._args.command == COMMAND.SEGMENTATION:
+            assert self._args.model_state is not None
 
     def _add_arguments_to_parser(self, parser: ArgumentParser):
+        parser.add_argument('command', choices=[
+            COMMAND.ANNOTATIONS,
+            COMMAND.FLYER,
+            COMMAND.SEGMENTATION,
+        ], help='Command to run')
         parser.add_argument('-a', '--annotations-file', help='File path to annotation JSON')
         parser.add_argument('-i', '--image', dest='image_path', help='File path to test image')
-        parser.add_argument('-r', '--request-ocr', action='store_true', help='Request annotation from OCR service as a fall back')
+        parser.add_argument('-r', '--request-ocr', action='store_true',
+                            help='Request annotation from OCR service as a fall back')
+        parser.add_argument('-m', '--model-state', help='File path to the model state dict')
+        parser.add_argument('--save', action='store_true', help='Add a save modifier to the command')
+        parser.add_argument('--display', action='store_true', help='Add a display modifier to the command')

@@ -2,7 +2,8 @@ import re
 
 from flyer.flyer_components import (AdBlock, AdBlockComponent,
                                     AdBlockComponentType, Measurement,
-                                    Promotion, PromotionType, Quantity)
+                                    PriceUnit, Promotion, PromotionType,
+                                    Quantity)
 
 from .annotation_types import HierarchicalAnnotation
 
@@ -56,6 +57,15 @@ def extract_component_from_block(block_annotation: HierarchicalAnnotation) -> Ad
         return AdBlockComponent(
             AdBlockComponentType.PROMOTION,
             value=promotion,
+            bounds=block_annotation.bounds
+        )
+
+    # Check if the block is a price unit
+    price_unit = find_price_unit_in_text(block_annotation.text)
+    if price_unit is not None:
+        return AdBlockComponent(
+            AdBlockComponentType.PRODUCT_PRICE_UNIT,
+            value=price_unit,
             bounds=block_annotation.bounds
         )
 
@@ -193,6 +203,16 @@ def find_promotion_in_text(text: str) -> 'Promotion | None':
             return promotion
 
     return None
+
+
+def find_price_unit_in_text(text: str) -> 'PriceUnit | None':
+    processed_text = text.lower().strip()
+
+    if processed_text in {'ea', 'each'}:
+        return PriceUnit.EACH
+
+    if processed_text in {'pkg', 'package'}:
+        return PriceUnit.PACKAGE
 
 
 def is_text_product_description(text: str) -> bool:

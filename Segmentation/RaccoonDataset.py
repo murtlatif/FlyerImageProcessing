@@ -1,26 +1,27 @@
-import pycocotools
 import os
+
 import numpy as np
+import pandas as pd
 import torch
 import torch.utils.data
-from PIL import Image, ImageDraw
-import pandas as pd
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from engine import train_one_epoch, evaluate
-import utils
-import transforms as T
 import torchvision
+from PIL import Image, ImageDraw
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+
+from . import transforms as T
+
 
 def parse_one_annot(path_to_data_file, filename):
     data = pd.read_csv(path_to_data_file)
-    boxes_array = data[data["filename"] == filename][["xmin", "ymin",        
-    "xmax", "ymax"]].values
+    boxes_array = data[data["filename"] == filename][["xmin", "ymin",
+                                                      "xmax", "ymax"]].values
 
     labels = data[data["filename"] == filename][["class"]].values.flatten()
     labels = np.where(labels == 'ad_block', 1, 0)
     labels = torch.tensor(labels, dtype=torch.int64)
-   
+
     return boxes_array, labels
+
 
 def get_model(num_classes):
     # load an object detection model pre-trained on COCO
@@ -29,18 +30,20 @@ def get_model(num_classes):
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
-    
+
     return model
 
+
 def get_transform(train):
-   transforms = []
-   # converts the image, a PIL image, into a PyTorch Tensor
-   transforms.append(T.ToTensor())
-   if train:
+    transforms = []
+    # converts the image, a PIL image, into a PyTorch Tensor
+    transforms.append(T.ToTensor())
+    if train:
         # during training, randomly flip the training images
         # and ground-truth for data augmentation
         transforms.append(T.RandomHorizontalFlip(0.5))
-   return T.Compose(transforms)
+    return T.Compose(transforms)
+
 
 class RaccoonDataset(torch.utils.data.Dataset):
     def __init__(self, root, data_file, transforms=None):
@@ -53,7 +56,7 @@ class RaccoonDataset(torch.utils.data.Dataset):
         # load images and bounding boxes
         img_path = os.path.join(self.root, self.imgs[idx])
         img = Image.open(img_path).convert("RGB")
-        if self.path_to_data_file == None:
+        if self.path_to_data_file is None:
             # num_objs = len(box_list)
             image_id = torch.tensor([idx])
             # iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
@@ -76,7 +79,7 @@ class RaccoonDataset(torch.utils.data.Dataset):
         # labels = torch.ones((num_objs,), dtype=torch.int64)
         image_id = torch.tensor([idx])
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:,
-        0])
+                                                                  0])
         # suppose all instances are not crowd
         iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
         target = {}
@@ -91,4 +94,4 @@ class RaccoonDataset(torch.utils.data.Dataset):
         return img, target
 
     def __len__(self):
-            return len(self.imgs)
+        return len(self.imgs)

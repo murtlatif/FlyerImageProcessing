@@ -7,3 +7,9 @@ ANNOTATION_LEVEL_COLORS = {
     AnnotationLevel.WORD: (235, 210, 50),  # YELLOW
     AnnotationLevel.SYMBOL: (20, 20, 100),  # BLUE
 }
+
+
+class COMMAND:
+    ANNOTATIONS = 'annotations'
+    FLYER = 'flyer'
+    SEGMENTATION = 'segmentation'
