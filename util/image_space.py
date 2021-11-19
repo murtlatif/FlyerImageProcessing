@@ -1,0 +1,67 @@
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+
+
+@dataclass
+class Vertex:
+    x: int
+    y: int
+
+    @staticmethod
+    def from_dict(vertex_dict: dict[str, int]) -> Vertex:
+        return Vertex(x=vertex_dict.x, y=vertex_dict.y)
+
+
+def distance_between_regions(region: list[Vertex], other_region: list[Vertex]) -> float:
+    polygon = _region_to_polygon(region)
+    other_polygon = _region_to_polygon(other_region)
+
+    return polygon.distance(other_polygon)
+
+
+def is_vertex_in_region(region: list[Vertex], target_vertex: Vertex) -> bool:
+    """
+    Uses Shapely to determine if a vertex is inside a given region.
+
+    Args:
+        region (list[Vertex]): Vertices of the polygon region
+        target_vertex (Vertex): Target vertex to check
+
+    Returns:
+        bool: Whether the target vertex is in the region
+    """
+    polygon = _region_to_polygon(region)
+    target_point = _vertex_to_point(target_vertex)
+    return polygon.contains(target_point)
+
+
+def does_region_intersect(region: list[Vertex], other_region: list[Vertex]) -> bool:
+    """
+    Uses Shapely to determine if a region intersects another region.
+
+    Args:
+        region (list[Vertex]): Target region
+        other_region (list[Vertex]): Other region
+
+    Returns:
+        bool: Whether the two given regions intersect
+    """
+    region_polygon = _region_to_polygon(region)
+    other_region_polygon = _region_to_polygon(other_region)
+
+    return region_polygon.intersects(other_region_polygon)
+
+
+def _region_to_polygon(region: list[Vertex]) -> Polygon:
+    region_points = [(point.x, point.y) for point in region]
+    polygon = Polygon(region_points)
+    return polygon
+
+
+def _vertex_to_point(vertex: Vertex) -> Point:
+    point = Point(vertex.x, vertex.y)
+    return point

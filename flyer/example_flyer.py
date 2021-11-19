@@ -1,4 +1,8 @@
-from .flyer_types import AdBlock, Flyer, FlyerType, Measurement, Page, PageType
+from util.image_space import Vertex
+
+from .flyer_components import (AdBlock, Flyer, FlyerType, Measurement, Page,
+                               PageType, Product, Promotion, PromotionType,
+                               Quantity)
 
 EXAMPLE_FLYER = Flyer(
     flyer_type=FlyerType.WEEKLY,
@@ -7,25 +11,68 @@ EXAMPLE_FLYER = Flyer(
             page_type=PageType.MULTI_AD,
             ad_blocks=[
                 AdBlock(
-                    product_name='Lisa\'s Lemons',
-                    product_price=3.99,
-                    unit_of_measurement=Measurement.kg
+                    product=Product(
+                        name="Lisa's Lemons",
+                        description="The perfect amount of sour.",
+                        price=399,
+                        quantity=Quantity(
+                            measurement=Measurement.unit,
+                            amount=4
+                        )
+                    ),
+                    bounds=[
+                        Vertex(0, 0),
+                        Vertex(0, 100),
+                        Vertex(100, 100),
+                        Vertex(100, 0),
+                    ]
                 ),
                 AdBlock(
-                    product_name='Stephen\'s Sausage',
-                    product_price=5.99,
-                    unit_of_measurement=Measurement.OTHER
+                    product=Product(
+                        name="Stephen's Star Fruits",
+                        description="But there is no brighter star then Stephen himself.",
+                        price=1299,
+                        quantity=Quantity(
+                            measurement=Measurement.kg,
+                            amount=0.3
+                        )
+                    ),
+                    promotion=Promotion(
+                        promotion_type=PromotionType.PERCENTAGE,
+                        amount=15,
+                        promotion_text="15% OFF!",
+                    ),
+                    bounds=[]
                 ),
                 AdBlock(
-                    product_name='Sandra\'s Sesame Seeds',
-                    product_price=4.99,
-                    unit_of_measurement=Measurement.kg
+                    product=Product(
+                        name="Sandra's Sangria",
+                        description="Great for a monday morning.",
+                        price=2199,
+                        quantity=Quantity(
+                            measurement=Measurement.L,
+                            amount=1.5
+                        )
+                    ),
+                    promotion=Promotion(
+                        promotion_type=PromotionType.BUY_ONE_GET_N_PERCENT_OFF,
+                        amount=50,
+                        promotion_text='Buy one get one 50% off!'
+                    ),
+                    bounds=[]
                 ),
                 AdBlock(
-                    product_name='Murtaza\'s Meat',
-                    product_price=2.99,
-                    unit_of_measurement=Measurement.oz
-                )
+                    product=Product(
+                        name="Murtaza's Meat",
+                        description="Bones can be removed upon request. Will cut in store if needed.",
+                        price=1999,
+                        quantity=Quantity(
+                            measurement=Measurement.oz,
+                            amount=4.3
+                        )
+                    ),
+                    bounds=[]
+                ),
             ]
         )
     ]

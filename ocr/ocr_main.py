@@ -1,19 +1,16 @@
-import os.path
-
 from config import Config
-from flyer.flyer_types import Flyer
 from flyer.marshal_flyer import marshal_flyer
 from util.constants import ANNOTATION_LEVEL_COLORS
 from util.file_path_util import get_file_name_without_ext
 
-from .annotation_types import Annotation, AnnotationLevel
-from .display_bounds import (draw_flat_annotations,
+from .annotation_types import AnnotationLevel
+from .display_bounds import (draw_ad_blocks, draw_flat_annotations,
                              draw_hierarchical_annotations)
 from .get_annotations import get_text_annotations
 from .google_cloud.annotation_response import (
     load_response_from_json, response_to_flat_annotations,
     response_to_hierarchical_annotations)
-from .ocr_segmentation import segment_page
+from .process_annotations import process_flyer_annotation
 
 
 def draw_annotations_on_image(
@@ -59,18 +56,6 @@ def draw_annotations_on_image(
     bounded_image.save(f'bounded_{image_file_without_extension}.png')
 
 
-def segment_with_ocr(hierarchical_annotations: list[Annotation]):
-    segmented_page = segment_page(hierarchical_annotations)
-    flyer = Flyer(
-        pages=[
-            segmented_page,
-        ]
-    )
-
-    marshal_flyer(flyer, 'test_segmentation')
-    return flyer
-
-
 def ocr_main():
     image_path = Config.args.image_path
 
@@ -83,8 +68,14 @@ def ocr_main():
 
     # print(hierarchical_annotations)
 
-    draw_hierarchical_annotations(image_path, hierarchical_annotations, annotation_level_whitelist={
-                                  AnnotationLevel.PAGE, AnnotationLevel.PARA, AnnotationLevel.BLOCK, AnnotationLevel.WORD})
+    # draw_hierarchical_annotations(image_path, hierarchical_annotations, annotation_level_whitelist={
+    #                               AnnotationLevel.PAGE, AnnotationLevel.BLOCK})
+
+    flyer = process_flyer_annotation(hierarchical_annotations)
+    file_name = get_file_name_without_ext(Config.args.image_path or Config.args.annotations_file or 'UnnamedFlyer')
+    marshal_flyer(flyer, file_path=file_name)
+
+    draw_ad_blocks(image_path, flyer.pages[0].ad_blocks)
     # segment_with_ocr(page_annotations)
     # ocr_main(hierarchical_annotations)
 

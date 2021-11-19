@@ -1,4 +1,5 @@
 from util.file_path_util import get_file_name_without_ext
+from util.image_space import Vertex, does_region_intersect
 
 from .annotation_types import Annotation
 from .google_cloud import google_cloud_client
@@ -80,3 +81,25 @@ def request_text_annotations(file_image_path: str, save_file: str = None, hierar
         annotations = response_to_flat_annotations(annotation_response)
 
     return annotations
+
+
+def find_annotations_in_region(
+    annotations: list[Annotation],
+    region_vertices: list[Vertex],
+) -> list[Annotation]:
+    """
+    Filters the list of annotations to all of the annotations that
+    intersect the specified region.
+
+    Args:
+        annotations (list[Annotation]): Annotations to filter
+        region_vertices (list[Vertex]): Region to intersect
+
+    Returns:
+        list[Annotation]: Annotations that intersect with the region
+    """
+    def does_annotation_intersect(annotation: Annotation) -> bool:
+        return does_region_intersect(annotation.bounds, region_vertices)
+
+    annotations_in_region = list(filter(does_annotation_intersect, annotations))
+    return annotations_in_region

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from flyer.flyer_components import AdBlock
 from PIL import Image, ImageDraw, ImageFont
 from util.constants import ANNOTATION_LEVEL_COLORS
 from util.random_color import generate_random_color
@@ -151,6 +152,34 @@ def draw_flat_annotations(image_source: str, annotations: list[Annotation], show
         # Write the text
         text_position = (annotation.bounds[0].x + 2, annotation.bounds[0].y)
         draw.text(text_position, text=annotation.text, fill=annotation_color, font=font)
+
+    if show_image:
+        image.show()
+
+    return image
+
+
+def draw_ad_blocks(image_source: str, ad_blocks: list[AdBlock], show_image: bool = True) -> Image.Image:
+    image = Image.open(image_source)
+    image = image_to_color(image)
+
+    font = ImageFont.truetype('arial.ttf', 16)
+    draw = ImageDraw.Draw(image)
+
+    for ad_block in ad_blocks:
+        annotation_color = generate_random_color()
+
+        # Draw a line from vertex[i] to vertex[i+1]
+        for vertex_idx in range(len(ad_block.bounds)):
+            vertex_from = ad_block.bounds[vertex_idx]
+            vertex_to = ad_block.bounds[(vertex_idx + 1) % len(ad_block.bounds)]
+
+            line = ((vertex_from.x, vertex_from.y), (vertex_to.x, vertex_to.y))
+            draw.line(line, width=2, fill=annotation_color)
+
+        # Write the text
+        text_position = (ad_block.bounds[0].x + 2, ad_block.bounds[0].y)
+        draw.text(text_position, text=str(ad_block), fill=annotation_color, font=font)
 
     if show_image:
         image.show()
