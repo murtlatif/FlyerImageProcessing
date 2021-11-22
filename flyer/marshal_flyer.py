@@ -1,9 +1,9 @@
 import json
 from dataclasses import asdict
 
-from util.default_file_ext import apply_default_file_ext
+from util.file_path_util import apply_default_file_ext
 
-from .flyer_types import Flyer
+from .flyer_components import Flyer
 
 
 def marshal_flyer(flyer: Flyer, file_path: str):
