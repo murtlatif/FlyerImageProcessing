@@ -32,11 +32,6 @@ class Measurement(StringValueEnum):
         return measurements
 
 
-class PriceUnit(StringValueEnum):
-    EACH = 'each'
-    PACKAGE = 'pkg'
-
-
 class PageType(StringValueEnum):
     MULTI_AD = 'multi-ad'
     OTHER = 'other'
@@ -60,6 +55,7 @@ class AdBlockComponentType(Enum):
     PRODUCT_NAME = auto()
     PRODUCT_DESCRIPTION = auto()
     PRODUCT_PRICE = auto()
+    PRODUCT_CODE = auto()
     PRODUCT_PRICE_UNIT = auto()
     QUANTITY = auto()
     PROMOTION = auto()
@@ -73,13 +69,14 @@ class AdBlockComponent:
 
 
 @dataclass
-class Quantity:
-    measurement: Measurement = None
+class Quantity():
+    measurement: Measurement
+    text: str
     amount: float = None
 
 
 @dataclass
-class Promotion:
+class Promotion():
     promotion_type: PromotionType
     amount: float
     promotion_text: str
@@ -89,8 +86,9 @@ class Promotion:
 class Product:
     name: str = None
     description: str = None
+    code: str = None
     price: int = None
-    price_unit: PriceUnit = None
+    price_unit: str = None
     quantity: Quantity = field(default_factory=Quantity)
 
 

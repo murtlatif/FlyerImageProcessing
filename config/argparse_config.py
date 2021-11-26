@@ -60,3 +60,4 @@ class ArgparseConfig:
         parser.add_argument('-v', '--verbose', action='store_true', help='Increase verbosity of program')
         parser.add_argument('--save', action='store_true', help='Add a save modifier to the command')
         parser.add_argument('--display', action='store_true', help='Add a display modifier to the command')
+        parser.add_argument('--download', action='store_true', help='Download NLTK data')
