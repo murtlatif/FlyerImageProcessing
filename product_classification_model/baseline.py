@@ -11,46 +11,11 @@ wnLem = WordNetLemmatizer()
 
 N = 5
 tokenizer = RegexpTokenizer(r"\w+")
-#                0         1       2         3          4        5
-categories = ["bakery", "meat", "dairy", "grocery", "fruit", "vegetable"]
+#                0         1       2         3          4        5            6
+categories = ["produce", "deli", "grocery", "bakery", "dairy", "household"]
 
-items = [
-    # "vegetable"
-    ["Hand picked green beans", 5],
-    ["FRESH WHITE MUSHROOMS", 5],
-    ["RAINBOW SWEET BELL PEPPERS", 5],
-    ["ORGANIC LEEK BUNCHES", 5],
-    ["CREAMER POTATOES", 5],
-    # "fruit"
-    ["GALA APPLES", 4],
-    ["SWEET SEEDLESS NAVEL ORANGES", 4],
-    ["ORGANIC LEMONS", 4],
-    ["LARGE AVOCADOS", 4],
-    ["Sweet and juicy blueberries", 4],
-    # "grocery"
-    ["Sunflower Seed Butter", 3],
-    ["Loaded Baked Potato Soup", 3],
-    ["Snack Clusters Cinnamon", 3],
-    ["Creamy Coleslaw Dressing", 3],
-    ["Harvest Kale Salad", 3],
-    # "dairy"
-    ["Organic Old Cheddar Cheese", 2],
-    ["Organic Medium Cheddar Cheese", 2],
-    ["Organic Marble Cheddar Cheese", 2],
-    ["Large Eggs (dozen)", 2],
-    ["APPLEWOOD SMOKY CHEDDAR", 2],
-    # "meat"
-    ["Gluten-Free Breaded Pacific Cod", 1],
-    ["Fresh, Skin-On, Chicken Drumsticks", 1],
-    ["Garlic Salami", 1],
-    ["Southwest Beef Schnitzel", 1],
-    ["Parmesan Rapini Sausage", 1],
-    # "bakery"
-    ["Belgian Chocolate Assortment", 0],
-    ["Classic Nun’s Pastry", 0],
-    ["Maple Flavour Nun’s Pastry", 0],
-    ["Grape Soda Flavoured Caramel Corn", 0],
-    ["Pumpkin Spice Coffee Cake", 0],
+items = pd.read_csv("../product_classification_data/products_by_name.csv")[
+    ["text", "label"]
 ]
 
 bakery = (
@@ -71,6 +36,14 @@ veg = (
     .to_numpy()
     .flatten()[:58]
 )
+produce = (
+    pd.read_csv("../product_classification_data/produce.csv").to_numpy().flatten()[:58]
+)
+household = (
+    pd.read_csv("../product_classification_data/household.csv")
+    .to_numpy()
+    .flatten()[:58]
+)
 # print(len(bakery), len(dairy), len(meat), len(grocery), len(fruit), len(veg))
 
 
@@ -80,7 +53,7 @@ def get_pred(query):
     for i, url in enumerate(
         search(query.lower(), tld="com", lang="en", num=N, stop=N, pause=2)
     ):
-        print("url", url)
+        # print("url", url)
         try:
             r = requests.get(url, timeout=5)
         except:
@@ -122,7 +95,8 @@ def get_pred(query):
             prev_prev_word, prev_word = prev_word, word
 
         scores = np.array([])
-        for category in [bakery, meat, dairy, grocery, fruit, veg]:
+
+        for category in [produce, meat, grocery, bakery, dairy, household]:
             score = np.mean(
                 np.array([1 if word in tokenized_words else 0 for word in category])
             )
@@ -139,14 +113,16 @@ def get_pred(query):
                 "category": categories[np.argmax(scores)],
                 "max_score": np.amax(scores),
             }
-        print("scores", scores)
+        # print("scores", scores)
 
     return None if failed_url_count == N else prediction
 
 
 cnt = 0
 no_search_results = 0
-for item, label in items:
+for i, row in items.iterrows():
+    item = row.text
+    label = row.label
     predicted = get_pred(item)
     print("predicted", predicted)
     if predicted == None:
