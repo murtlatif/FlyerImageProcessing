@@ -151,6 +151,46 @@ def create_dairy():
     df.to_csv("dairy.csv", index=None)
 
 
+def create_household():
+    """
+    Create a csv of household items.
+    """
+    household = set()
+    # household
+    r = requests.get(
+        "https://www.outofmilk.com/ideas/household-essentials-shopping-list/"
+    )
+    soup = BeautifulSoup(r.content, "html5lib")
+    table = soup.find(
+        "div", attrs={"class": "intro_text sectionWrap small-12 medium-12 columns"}
+    )
+    for row in table.findAll("li"):
+        household.add(wnLem.lemmatize(row.text.lower().strip()))
+
+    table = soup.find(
+        "div", attrs={"class": "shopping_list sectionWrap small-12 medium-12 columns"}
+    )
+    for row in table.findAll("li"):
+        household.add(wnLem.lemmatize(row.text.lower().strip()))
+
+    r = requests.get(
+        "https://updater.com/moving-tips/the-ultimate-new-home-grocery-shopping-list"
+    )
+    soup = BeautifulSoup(r.content, "html5lib")
+    table = soup.find("ul", attrs={"class": "squares"})
+    for rows in table:
+        household.add(wnLem.lemmatize(rows.text.lower()))
+
+    household.update(
+        set(pd.read_csv("suppliment/household_suppliment.csv").to_numpy().flatten())
+    )
+
+    df = pd.DataFrame(sorted(list(household)))
+    print("df", df)
+    df.columns = ["household"]
+    df.to_csv("household.csv", index=None)
+
+
 def create_grocery():
     """
     Create a csv of grocery items. It will substract the sets of the other categories
@@ -217,4 +257,5 @@ if __name__ == "__main__":
     create_meat()
     create_bakery()
     create_dairy()
+    create_household()
     create_grocery()
