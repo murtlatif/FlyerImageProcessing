@@ -8,8 +8,8 @@ from nltk.tag import PerceptronTagger
 from nltk.tree import Tree
 from util.constants import STOP_WORDS
 
-# if Config.args.download:
-# nltk.download("averaged_perceptron_tagger")
+if Config.args.download:
+    nltk.download("averaged_perceptron_tagger")
 
 
 class Grammar:
@@ -103,7 +103,13 @@ class PhraseExtractor:
 
     @staticmethod
     def extract_phrases(text: str, grammar: str) -> list[str]:
+        if not text:
+            return []
+
         chunked_words = PhraseExtractor.get_chunked_words(text, grammar)
+
+        if not chunked_words:
+            return []
 
         terms = PhraseExtractor.get_terms(chunked_words)
         flattened_phrase_lists = PhraseExtractor.flatten_phrase_lists(terms)
@@ -116,6 +122,9 @@ class PhraseExtractor:
         chunker = nltk.RegexpParser(grammar)
 
         words = re.findall(r'\w+', text)
+        if not words:
+            return None
+
         tagged_words = tag(words)
         chunked_words: Tree = chunker.parse(tagged_words)
 

@@ -10,28 +10,6 @@ class StringValueEnum(str, Enum):
         return f'<{self.__class__.__name__}.{self.name}>'
 
 
-class Measurement(StringValueEnum):
-    lb = 'lb'
-    lbs = 'lbs'
-    oz = 'oz'
-    kg = 'kg'
-    mL = 'ml'
-    g = 'g'
-    L = 'l'
-    unit = 'unit'
-
-    @staticmethod
-    def valid_measurements() -> list[str]:
-        """
-        Gets a list of valid measurements strings.
-
-        Returns:
-            list[str]: Valid measurement strings
-        """
-        measurements = [measurement.value for measurement in Measurement]
-        return measurements
-
-
 class PageType(StringValueEnum):
     MULTI_AD = 'multi-ad'
     OTHER = 'other'
@@ -39,6 +17,7 @@ class PageType(StringValueEnum):
 
 class FlyerType(StringValueEnum):
     WEEKLY = 'weekly'
+    HOLIDAY = 'holiday'
     OTHER = 'other'
 
 
@@ -70,16 +49,22 @@ class AdBlockComponent:
 
 @dataclass
 class Quantity():
-    measurement: Measurement
+    measurement: str
     text: str
-    amount: float = None
+    amount: str
 
 
 @dataclass
 class Promotion():
     promotion_type: PromotionType
-    amount: float
+    amount: str
     promotion_text: str
+
+
+@dataclass
+class CategoryPrediction:
+    category: str = None
+    confidence: float = None
 
 
 @dataclass
@@ -87,6 +72,7 @@ class Product:
     name: str = None
     description: str = None
     code: str = None
+    category: CategoryPrediction = field(default_factory=CategoryPrediction)
     price: int = None
     price_unit: str = None
     quantity: Quantity = field(default_factory=Quantity)
@@ -104,6 +90,7 @@ class AdBlock:
 class Page:
     page_type: PageType = None
     ad_blocks: list[AdBlock] = field(default_factory=list)
+    has_holiday_content: bool = False
 
 
 @dataclass

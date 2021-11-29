@@ -1,6 +1,6 @@
 from util.image_space import Vertex
 
-from .flyer_components import (AdBlock, Flyer, FlyerType, Measurement, Page,
+from .flyer_components import (AdBlock, Flyer, FlyerType, Page,
                                PageType, Product, Promotion, PromotionType,
                                Quantity)
 
@@ -16,7 +16,7 @@ EXAMPLE_FLYER = Flyer(
                         description="The perfect amount of sour.",
                         price=399,
                         quantity=Quantity(
-                            measurement=Measurement.unit,
+                            measurement='pack of',
                             amount=4
                         )
                     ),
@@ -33,7 +33,7 @@ EXAMPLE_FLYER = Flyer(
                         description="But there is no brighter star then Stephen himself.",
                         price=1299,
                         quantity=Quantity(
-                            measurement=Measurement.kg,
+                            measurement='kg',
                             amount=0.3
                         )
                     ),
@@ -50,7 +50,7 @@ EXAMPLE_FLYER = Flyer(
                         description="Great for a monday morning.",
                         price=2199,
                         quantity=Quantity(
-                            measurement=Measurement.L,
+                            measurement='L',
                             amount=1.5
                         )
                     ),
@@ -67,7 +67,7 @@ EXAMPLE_FLYER = Flyer(
                         description="Bones can be removed upon request. Will cut in store if needed.",
                         price=1999,
                         quantity=Quantity(
-                            measurement=Measurement.oz,
+                            measurement='oz',
                             amount=4.3
                         )
                     ),

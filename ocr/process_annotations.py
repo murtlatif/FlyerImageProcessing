@@ -1,14 +1,45 @@
+import re
 from collections import defaultdict
 from typing import Any
-from ocr.get_annotations import find_annotations_in_region
 
 from flyer.flyer_components import (AdBlock, AdBlockComponent,
-                                    AdBlockComponentType, Flyer, FlyerType,
-                                    Page, PageType, Product)
-from util.image_space import Vertex, distance_between_regions, Region, get_region_area
+                                    AdBlockComponentType, CategoryPrediction,
+                                    Flyer, FlyerType, Page, PageType, Product)
+from product_classification_data import product_classifier
+from util.constants import HOLIDAY_WORD_LIST
+from util.image_space import (Region, Vertex, distance_between_regions,
+                              get_region_area)
+
+from ocr.get_annotations import find_annotations_in_region
 
 from .annotation_types import HierarchicalAnnotation
 from .ocr_flyer_analysis import extract_components_from_block
+
+
+def construct_flyer_from_pages(pages: list[Page]) -> Flyer:
+    """
+    Creates a Flyer object from a list of Pages.
+    """
+    flyer_type = FlyerType.WEEKLY
+    for page in pages:
+        if page.has_holiday_content:
+            flyer_type = FlyerType.HOLIDAY
+            break
+
+    flyer = Flyer(flyer_type=flyer_type, pages=pages)
+    return flyer
+
+
+def construct_page_from_ad_blocks(ad_blocks: list[AdBlock], page_annotation: HierarchicalAnnotation) -> Page:
+    """
+    Creates a Page object from a list of AdBlocks.
+    """
+    page_type = PageType.MULTI_AD if len(ad_blocks) > 1 else PageType.OTHER
+
+    has_holiday_content = contains_holiday_text(page_annotation.text)
+    page = Page(page_type, ad_blocks, has_holiday_content)
+
+    return page
 
 
 def process_page_annotation(page_annotation: HierarchicalAnnotation) -> Page:
@@ -16,12 +47,6 @@ def process_page_annotation(page_annotation: HierarchicalAnnotation) -> Page:
     Use a Page level HierarchicalAnnotation to extract the ad blocks
     shown on the page. The ad blocks and additional data are used to
     compile a Page object.
-
-    Args:
-        page_annotation (HierarchicalAnnotation): Annotation for the page
-
-    Returns:
-        Page: A page object containing the ad blocks on the page
     """
     all_ad_block_components: dict[AdBlockComponentType, list[AdBlockComponent]] = defaultdict(list)
 
@@ -33,21 +58,14 @@ def process_page_annotation(page_annotation: HierarchicalAnnotation) -> Page:
 
     ad_blocks = construct_ad_blocks_from_components(all_ad_block_components)
 
-    page_type = PageType.MULTI_AD if len(ad_blocks) > 1 else PageType.OTHER
-    page = Page(page_type=page_type, ad_blocks=ad_blocks)
+    page = construct_page_from_ad_blocks(ad_blocks, page_annotation)
 
     return page
 
 
 def process_flyer_annotation(page_annotations: list[HierarchicalAnnotation]) -> Flyer:
     """
-    Processes a list of page annotations into a flyer object.
-
-    Args:
-        page_annotations (list[HierarchicalAnnotation]): Page annotations
-
-    Returns:
-        Flyer: Compiled flyer object
+    Processes a list of page annotations into a Flyer object.
     """
     pages: list[Page] = []
 
@@ -55,12 +73,7 @@ def process_flyer_annotation(page_annotations: list[HierarchicalAnnotation]) -> 
         page = process_page_annotation(page_annotation)
         pages.append(page)
 
-    # TODO: Add logic to get flyer type
-    flyer_type = FlyerType.WEEKLY
-    flyer = Flyer(
-        flyer_type=flyer_type,
-        pages=pages
-    )
+    flyer = construct_flyer_from_pages(pages)
 
     return flyer
 
@@ -96,10 +109,29 @@ def process_segmented_page_annotation(page_annotation: HierarchicalAnnotation, p
         ad_block = construct_segmented_block_from_components(all_ad_block_components, segment_bounds)
         ad_blocks.append(ad_block)
 
-    page_type = PageType.MULTI_AD if len(ad_blocks) > 1 else PageType.OTHER
-    page = Page(page_type=page_type, ad_blocks=ad_blocks)
-
+    page = construct_page_from_ad_blocks(ad_blocks, page_annotation)
     return page
+
+
+def process_segmented_flyer_annotations(page_annotations: list[HierarchicalAnnotation], page_segmentations: list[list[Region]]) -> Flyer:
+    """
+    Processes a list of pages and segmentation data into a Flyer object.
+
+    Args:
+        page_annotations (list[HierarchicalAnnotation]): Page annotations
+        page_segmentations (list[list[Region]]): Segmentations for each page
+
+    Returns:
+        Flyer: Processed Flyer object
+    """
+    pages: list[Page] = []
+
+    for page_annotation, page_segmentation in zip(page_annotations, page_segmentations):
+        page = process_segmented_page_annotation(page_annotation, page_segmentation)
+        pages.append(page)
+
+    flyer = construct_flyer_from_pages(pages)
+    return flyer
 
 
 def construct_segmented_block_from_components(components: defaultdict[AdBlockComponentType, list[AdBlockComponent]], ad_block_bounds: Region) -> AdBlock:
@@ -171,10 +203,17 @@ def construct_segmented_block_from_components(components: defaultdict[AdBlockCom
         promotion = _get_component_value(promotions[0])
         extra_components.extend(promotions[1:])
 
+    # Get the category from the product classifier
+    product_category, confidence = product_classifier.classify(product_name)
+
     product = Product(
         name=product_name,
         description=product_description,
         code=product_code,
+        category=CategoryPrediction(
+            category=product_category,
+            confidence=confidence
+        ),
         price=product_price,
         price_unit=product_price_unit,
         quantity=quantity
@@ -187,35 +226,10 @@ def construct_segmented_block_from_components(components: defaultdict[AdBlockCom
     return ad_block
 
 
-def process_segmented_flyer_annotations(page_annotations: list[HierarchicalAnnotation], page_segmentations: list[list[Region]]) -> Flyer:
-    """
-    Processes a list of pages and segmentation data into a Flyer object.
-
-    Args:
-        page_annotations (list[HierarchicalAnnotation]): Page annotations
-        page_segmentations (list[list[Region]]): Segmentations for each page
-
-    Returns:
-        Flyer: Processed Flyer object
-    """
-    pages: list[Page] = []
-
-    for page_annotation, page_segmentation in zip(page_annotations, page_segmentations):
-        page = process_segmented_page_annotation(page_annotation, page_segmentation)
-        pages.append(page)
-
-    # TODO: Add logic to get flyer type
-    flyer_type = FlyerType.WEEKLY
-    flyer = Flyer(
-        flyer_type=flyer_type,
-        pages=pages
-    )
-
-    return flyer
-
-
 def construct_ad_blocks_from_components(components: defaultdict[AdBlockComponentType, list[AdBlockComponent]]) -> list[AdBlock]:
     """
+    TODO: Update to use new AdBlockComponents and Product Classificaiton on product name
+
     Constructs ad blocks using the nearest components of each type.
     The number of ad blocks is equal to the number of price components.
 
@@ -286,6 +300,9 @@ def get_nearest_component(from_component: AdBlockComponent, component_list: list
 
 
 def get_component_group_bounds(components: list[AdBlockComponent]) -> Region:
+    """
+    Gets the minimum bounds that contains all of the components.
+    """
     all_vertices = [vertex for component in components for vertex in component.bounds]
     x_values = [vertex.x for vertex in all_vertices]
     y_values = [vertex.y for vertex in all_vertices]
@@ -304,6 +321,9 @@ def get_component_group_bounds(components: list[AdBlockComponent]) -> Region:
 
 
 def get_biggest_component(components: list[AdBlockComponent]) -> tuple[AdBlockComponent, list[AdBlockComponent]]:
+    """
+    Selects the component in the list with the largest bounds area.
+    """
     biggest_component_idx = None
     biggest_component_size = 0
     for component_idx in range(len(components)):
@@ -325,7 +345,20 @@ def get_biggest_component(components: list[AdBlockComponent]) -> tuple[AdBlockCo
     return biggest_component, remaining_components
 
 
+def contains_holiday_text(text: str) -> bool:
+    """
+    Returns whether or not the text contains a word from the holiday word list.
+    """
+    holiday_text_pattern = r'\b(' + '|'.join(HOLIDAY_WORD_LIST) + r')\b'
+    holiday_match = re.search(holiday_text_pattern, text, flags=re.IGNORECASE)
+
+    return holiday_match is not None
+
+
 def _get_component_value(component: 'AdBlockComponent | None') -> Any:
+    """
+    Retrieves the value of the component, returning None if it is unable to.
+    """
     if component is None:
         return None
 

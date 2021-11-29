@@ -5,7 +5,8 @@ from flyer.flyer_components import Flyer
 from flyer.marshal_flyer import marshal_flyer
 from Segmentation.GetBoxes import get_segmented_boxes
 from util.constants import ANNOTATION_LEVEL_COLORS, COMMAND
-from util.file_path_util import get_file_name_without_ext
+from util.file_path_util import (create_directories_to_file,
+                                 get_file_name_without_ext)
 
 from .annotation_types import AnnotationLevel, HierarchicalAnnotation
 from .display_bounds import (draw_ad_blocks, draw_flat_annotations,
@@ -23,7 +24,7 @@ def draw_annotations_on_image(
     annotation_json_path: str,
     hierarchical: bool = True,
     request_annotations: bool = False,
-    save_file: str = None
+    save_file_path: str = None
 ):
     """
     Draws boxes around the annotations of an image. If `hierarchical` is True,
@@ -35,7 +36,7 @@ def draw_annotations_on_image(
         annotation_json_path (str): The path to the annotations JSON
         hierarchical (bool, optional): Whether the annotations are hierarchical. Defaults to True.
         request_annotations (bool, optional): Whether to request for annotations if the annotation JSON is not valid. Defaults to False.
-        save_file (str, optional): File name to save the annotations for if they were requested. Defaults to None.
+        save_file_path (str, optional): File name to save the annotations for if they were requested. Defaults to None.
 
     Returns:
         Image: The image with the annotation boundings drawn on
@@ -51,7 +52,7 @@ def draw_annotations_on_image(
 
     else:
         annotations = get_text_annotations(file_image_path=image_path,
-                                           request_as_fallback=request_annotations, save_file=save_file, hierarchical=hierarchical)
+                                           request_as_fallback=request_annotations, save_file_path=save_file_path, hierarchical=hierarchical)
 
     if hierarchical:
         bounded_image = draw_hierarchical_annotations(image_path, annotations)
@@ -62,6 +63,11 @@ def draw_annotations_on_image(
 
 
 def save_flyer(flyer: Flyer, file_path: str) -> None:
+    """
+    Saves the flyer object at the given file path. Will create a directory to
+    the path if it does not exist.
+    """
+    create_directories_to_file(file_path)
     marshal_flyer(flyer, file_path=file_path)
 
 
@@ -74,22 +80,9 @@ def process_flyer(hierarchical_annotations: list[HierarchicalAnnotation]) -> Fly
     return flyer
 
 
-def process_segmented_flyer(
-    hierarchical_annotations: list[HierarchicalAnnotation],
-    image_path: str,
-    model_state_file: str,
-) -> Flyer:
-    image_file_name = os.path.basename(image_path)
-    image_path_directory = os.path.dirname(image_path)
-    segmented_boxes = get_segmented_boxes(image_file_name, model_state_file, image_path_directory)
-
-    flyer = process_segmented_flyer_annotations(hierarchical_annotations, [segmented_boxes])
-    return flyer
-
-
 def ocr_main():
     image_path = Config.args.image_path
-    model_state_file = Config.args.model_state
+    segmentation_model_state_file = Config.args.segmentation_model_state
     annotation_file = Config.args.annotations_file
 
     hierarchical_annotations = get_text_annotations(
@@ -123,17 +116,18 @@ def ocr_main():
             draw_flyer_ad_blocks(flyer, image_path)
 
     if command == COMMAND.SEGMENTATION:
-        flyer = process_segmented_flyer(hierarchical_annotations, image_path, model_state_file)
+        return
+        # flyer = process_segmented_flyer(hierarchical_annotations, image_path, segmentation_model_state_file)
 
-        if Config.args.verbose:
-            print(flyer)
+        # if Config.args.verbose:
+        #     print(flyer)
 
-        if Config.args.save:
-            save_file_name = get_file_name_without_ext(annotation_file or image_path or 'UnnamedFlyer')
-            save_flyer(flyer, file_path=f'{save_file_name}_segmented')
+        # if Config.args.save:
+        #     save_file_name = get_file_name_without_ext(annotation_file or image_path or 'UnnamedFlyer')
+        #     save_flyer(flyer, file_path=f'{save_file_name}_segmented')
 
-        if Config.args.display:
-            draw_flyer_ad_blocks(flyer, image_path)
+        # if Config.args.display:
+        #     draw_flyer_ad_blocks(flyer, image_path)
 
 
 if __name__ == '__main__':

@@ -5,8 +5,10 @@ import pandas as pd
 import torch
 import torch.utils.data
 import torchvision
-from PIL import Image, ImageDraw
+from PIL import Image
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from util.constants import VALID_IMAGE_FILE_TYPES
+from util.file_path_util import has_extension
 
 from . import transforms as T
 
@@ -49,7 +51,10 @@ class RaccoonDataset(torch.utils.data.Dataset):
     def __init__(self, root, data_file, transforms=None):
         self.root = root
         self.transforms = transforms
-        self.imgs = sorted(os.listdir(os.path.join(root)))
+        self.imgs = [
+            entry.name for entry in os.scandir(root)
+            if entry.is_file() and has_extension(entry.name, valid_extensions=VALID_IMAGE_FILE_TYPES)
+        ]
         self.path_to_data_file = data_file
 
     def __getitem__(self, idx):

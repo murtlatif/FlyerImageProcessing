@@ -1,3 +1,5 @@
+import os.path
+
 from util.file_path_util import get_file_name_without_ext
 from util.image_space import Region, does_region_intersect
 
@@ -12,8 +14,9 @@ def get_text_annotations(
     annotation_json_path: str,
     file_image_path: str,
     request_as_fallback: bool = False,
-    save_file: str = None,
-    hierarchical: bool = True
+    save_file_path: str = None,
+    hierarchical: bool = True,
+    use_default_directory: bool = True,
 ) -> list[Annotation]:
     """
     Gets OCR annotation from the annotation JSON file given, or requests
@@ -21,14 +24,14 @@ def get_text_annotations(
 
     Requests annotation from the image if an image path is provided. If an
     annotation is requested, the annotation data will be saved to the path
-    specified by save_file. If no save_file is given, the file name will be set
-    to the file_image_path value.
+    specified by save_file_path. If no save_file_path is given, the file name 
+    will be set to the file_image_path value.
 
     Args:
         annotation_json_path (str): The annotation data file to load
         file_image_path (str): The path to the image to annotate
         rqeuest_as_fallback (bool, optional): Whether to request annotations if failed to load from JSON. Defaults to False.
-        save_file (str, optional): The name to save the annotated file as if an annotation was requested. Defaults to the image file name.
+        save_file_path (str, optional): The name to save the annotated file as if an annotation was requested. Defaults to the image file name.
         hierarchical (bool, optional): Whether to load the annotations using the hierarchical model. If False, will load flat annotations. Defaults to True.
 
     Raises:
@@ -37,7 +40,7 @@ def get_text_annotations(
     Returns:
         list[Annotation]: The list of annotations
     """
-    if annotation_json_path:
+    if annotation_json_path and os.path.isfile(annotation_json_path):
         response = load_response_from_json(annotation_json_path)
 
         if hierarchical:
@@ -46,22 +49,28 @@ def get_text_annotations(
             annotations = response_to_flat_annotations(response)
 
     elif request_as_fallback and file_image_path is not None:
-        annotations = request_text_annotations(file_image_path, save_file=save_file, hierarchical=hierarchical)
+        annotations = request_text_annotations(file_image_path, save_file_path=save_file_path,
+                                               hierarchical=hierarchical, use_default_directory=use_default_directory)
 
     else:
-        raise ValueError(f'No path given for annotation JSON or image.')
+        raise ValueError(f'Invalid path given for annotation JSON or image.')
 
     return annotations
 
 
-def request_text_annotations(file_image_path: str, save_file: str = None, hierarchical: bool = True) -> list[Annotation]:
+def request_text_annotations(
+    file_image_path: str,
+    save_file_path: str = None,
+    hierarchical: bool = True,
+    use_default_directory: bool = True
+) -> list[Annotation]:
     """
     Requests text annotations from Google Cloud and saves the data as a JSON
-    file. If no save_file_name is given, the file_image_path is used instead.
+    file. If no save_file_path is given, the file_image_path is used instead.
 
     Args:
         file_image_path (str): The path to the image to annotate
-        save_file (str, optional): The file name to save the annotation data as. Defaults to the image file name.
+        save_file_path (str, optional): The file name to save the annotation data as. Defaults to the image file name.
         hierarchical (bool, optional): Whether to get the hierarchical annotations. Will get flat annotations if False. Defaults to True.
 
     Returns:
@@ -69,11 +78,10 @@ def request_text_annotations(file_image_path: str, save_file: str = None, hierar
     """
     annotation_response = google_cloud_client.request_text_detection(file_image_path)
 
-    if save_file is None:
-        save_file = file_image_path
+    if save_file_path is None:
+        save_file_path = file_image_path
 
-    save_file = get_file_name_without_ext(save_file)
-    save_response_as_json(annotation_response, save_file)
+    save_response_as_json(annotation_response, save_file_path, use_default_directory=use_default_directory)
 
     if hierarchical:
         annotations = response_to_hierarchical_annotations(annotation_response)

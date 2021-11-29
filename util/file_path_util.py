@@ -1,4 +1,5 @@
 import os.path
+import pathlib
 
 
 def apply_default_file_ext(file_path: str, default_file_ext: str, force: bool = False):
@@ -35,3 +36,20 @@ def get_file_name_without_ext(file_path: str):
     file_name_without_ext = os.path.splitext(file_name)[0]
 
     return file_name_without_ext
+
+
+def create_directories_to_file(file_path: str):
+    """
+    Creates directories up to the given file path.
+    """
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
+
+
+def has_extension(file_path: str, valid_extensions: set[str]):
+    """
+    Checks if the file path contains an extension in the valid_extensions set.
+    """
+    file_extension = os.path.splitext(file_path)[1]
+    return file_extension in valid_extensions

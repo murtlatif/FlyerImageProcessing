@@ -2,9 +2,9 @@ import re
 
 from config import Config
 from flyer.flyer_components import (AdBlockComponent, AdBlockComponentType,
-                                    Measurement, Promotion, PromotionType,
-                                    Quantity)
-from util.constants import PROMOTION_WORDS
+                                    Promotion, PromotionType, Quantity)
+from util.constants import (MEASUREMENT_WORD_LIST, PACKAGE_MEASURE_WORD_LIST,
+                            PROMOTION_WORDS)
 from util.string_parse import (string_to_any_safe, string_to_float_safe,
                                string_to_int_safe)
 
@@ -21,18 +21,26 @@ def extract_components_from_block(block_annotation: HierarchicalAnnotation) -> l
     features.
     """
     components: AdBlockComponent = []
+    component_types_found: set[AdBlockComponentType] = set()
 
     component_extractors = [
-        extract_product_name_component,
-        # extract_product_description_component,
-        extract_product_code_component,
-        extract_price_component,
-        extract_price_unit_component,
-        extract_quantity_component,
-        extract_promotion_component,
+        (AdBlockComponentType.PRODUCT_NAME, extract_product_name_component),
+        (AdBlockComponentType.PRODUCT_CODE, extract_product_code_component),
+        (AdBlockComponentType.PRODUCT_PRICE, extract_price_component),
+        (AdBlockComponentType.PRODUCT_PRICE_UNIT, extract_price_unit_component),
+        (AdBlockComponentType.QUANTITY, extract_quantity_component),
+        (AdBlockComponentType.PROMOTION, extract_promotion_component),
+        (AdBlockComponentType.PRODUCT_DESCRIPTION, extract_product_description_component),
     ]
 
-    for component_extractor in component_extractors:
+    for component_type, component_extractor in component_extractors:
+
+        if (component_type == AdBlockComponentType.PRODUCT_DESCRIPTION and (
+            AdBlockComponentType.PRODUCT_NAME in component_types_found or
+            AdBlockComponentType.PROMOTION in component_types_found
+        )):
+            continue
+
         component = component_extractor(block_annotation)
         if component is not None:
             components.append(component)
@@ -55,14 +63,8 @@ def extract_components_from_block(block_annotation: HierarchicalAnnotation) -> l
 
 def extract_product_code_component(block: HierarchicalAnnotation) -> 'AdBlockComponent | None':
     """
-    Extracts the product code from the text.
-
-    The product code is set in the environment configuration. Removes
-    the product code from the given text and returns both the product
-    code and the extracted text.
-
-    Returns:
-        tuple[AdBlockComponent | None, str]: Product code component and the remaining string after extraction.
+    Extracts the product code from the text. The product code is set in the
+    environment configuration.
     """
     text = ' '.join(block.text.split())
 
@@ -89,26 +91,53 @@ def extract_quantity_component(block: HierarchicalAnnotation) -> 'AdBlockCompone
     """
     text = ' '.join(block.text.split())
 
+    # Check if the measurement is "PKG OF N"
+    package_unit_pattern = '|'.join(PACKAGE_MEASURE_WORD_LIST)
+    pkg_of_pattern = '((' + package_unit_pattern + r') of )(((\d+(\.\d+)?) ?[-x] ?)?(\d+(\.\d+)?))'
+    pkg_of_match = re.search(pkg_of_pattern, text, flags=re.IGNORECASE)
+
+    if pkg_of_match:
+        quantity_unit = pkg_of_match.group(1)
+        quantity_amount = pkg_of_match.group(3)
+
+        quantity = Quantity(
+            measurement=quantity_unit.strip(),
+            amount=quantity_amount,
+            text=text
+        )
+
+        quantity_component = AdBlockComponent(
+            AdBlockComponentType.QUANTITY,
+            value=quantity,
+            bounds=block.bounds,
+        )
+
+        return quantity_component
+
     # Matches a measurement with an optional number in front (including decimals)
-    measurements_union_regex = '(' + '|'.join(Measurement.valid_measurements()) + ')'
-    optional_number_regex = r'(\d+(\.\d+)?) ?'
-    quantity_regex_pattern = optional_number_regex + measurements_union_regex + r'\b'
+    measurements_union_regex = '(' + '|'.join(MEASUREMENT_WORD_LIST) + ')'
+    quantity_amount_regex = r'(((\d+(\.\d+)?) ?[-x] ?)?(\d+(\.\d+)?) ?)'
+    quantity_regex_pattern = quantity_amount_regex + measurements_union_regex + r'\b'
 
     quantity_regex_match = re.search(quantity_regex_pattern, text, flags=re.IGNORECASE)
     if quantity_regex_match is None:
         return None
 
-    amount_string = quantity_regex_match.group(1)
-    measurement_string = quantity_regex_match.group(3)
+    full_amount_string = quantity_regex_match.group(1).strip()
+    amount_prefix_string = quantity_regex_match.group(2)
+    amount_string = quantity_regex_match.group(5)
+    measurement = quantity_regex_match.group(7).strip()
 
     # Process the amount and measurement
     stripped_amount_string = amount_string.strip()
     amount = string_to_float_safe(stripped_amount_string)
-    measurement = string_to_any_safe(measurement_string.lower(), Measurement)
+
+    if amount_prefix_string is None and (amount is None or amount >= 10000):
+        return None
 
     quantity = Quantity(
         measurement=measurement,
-        amount=amount,
+        amount=full_amount_string.strip(),
         text=text,
     )
 
@@ -129,7 +158,7 @@ def extract_price_component(block: HierarchicalAnnotation) -> 'AdBlockComponent 
     text = ' '.join(block.text.lower().split())
 
     # Is price a X/$Y format? (e.g. 2/$3 or 3 for $4)
-    x_for_y_regex_pattern = r'(\d+) ?[\/(for)] ?(\$ ?)?(\d+(\.\d+)?)'
+    x_for_y_regex_pattern = r'(\d+) ?(\/|for) ?([\$s] ?)?(\d+(\.\d+)?)'
     x_for_y_match = re.match(x_for_y_regex_pattern, text)
 
     if x_for_y_match:
@@ -205,7 +234,7 @@ def extract_promotion_component(block: HierarchicalAnnotation) -> 'AdBlockCompon
 
         promotion = Promotion(
             PromotionType.BUY_N_GET_ONE_FREE,
-            amount=n_value,
+            amount=str(n_value),
             promotion_text=text,
         )
 
@@ -220,21 +249,18 @@ def extract_promotion_component(block: HierarchicalAnnotation) -> 'AdBlockCompon
     # TODO: Check other promotion types here
 
     # Finally: Check for amount value and generic promotion text
-    amount_pattern = r'\$?(\d+(\.\d+)?)%?'
+    amount_pattern = r'\$?((\d+(\.\d+)?)%? ?- ?)?\$?(\d+(\.\d+)?)%?'
     amount_match = re.search(amount_pattern, text)
     if amount_match is None:
         return None
 
     full_amount_string = amount_match.group()
-    amount_string = amount_match.group(1)
 
     # Get amount and promotion type for percentage vs dollars
     if '%' in full_amount_string:
         promotion_type = PromotionType.PERCENTAGE
-        amount = string_to_int_safe(amount_string)
     else:
         promotion_type = PromotionType.FLAT
-        amount = _string_to_price(amount_string)
 
     # Only consider to be promotion if have value AND promotion text
     promotion = None
@@ -242,7 +268,7 @@ def extract_promotion_component(block: HierarchicalAnnotation) -> 'AdBlockCompon
         if promotion_word in text.lower():
             promotion = Promotion(
                 promotion_type=promotion_type,
-                amount=amount,
+                amount=full_amount_string,
                 promotion_text=text,
             )
             break
@@ -280,7 +306,7 @@ def extract_price_unit_component(block: HierarchicalAnnotation) -> 'AdBlockCompo
         return price_unit_component
 
     # Extract price unit as EACH for a X/$Y format (e.g. 2/$3 or 3 for $4)
-    x_for_y_regex_pattern = r'(\d+) ?[\/(for)] ?(\$ ?)?(\d+(\.\d+)?)'
+    x_for_y_regex_pattern = r'(\d+) ?(\/|for) ?([\$s] ?)?(\d+(\.\d+)?)'
     x_for_y_match = re.match(x_for_y_regex_pattern, text)
 
     if x_for_y_match:
@@ -306,7 +332,29 @@ def extract_price_unit_component(block: HierarchicalAnnotation) -> 'AdBlockCompo
 
         return price_unit_component
 
-    return None
+    # Find a measurement without a value
+    measurements_union_regex = '(' + '|'.join(MEASUREMENT_WORD_LIST) + ')'
+    optional_number_regex = r'(((\d+(\.\d+)?) ?)|\b)'
+    quantity_regex_pattern = optional_number_regex + measurements_union_regex + r'\b'
+
+    quantity_regex_match = re.search(quantity_regex_pattern, text, flags=re.IGNORECASE)
+    if quantity_regex_match is None:
+        return None
+
+    amount_string = quantity_regex_match.group(1)
+    measurement_string = quantity_regex_match.group(5)
+
+    if amount_string:
+        return None
+
+    price_unit = measurement_string
+    price_unit_component = AdBlockComponent(
+        AdBlockComponentType.PRODUCT_PRICE_UNIT,
+        value=price_unit,
+        bounds=block.bounds,
+    )
+
+    return price_unit_component
 
 
 def extract_product_name_component(block: HierarchicalAnnotation) -> 'AdBlockComponent | None':
@@ -332,7 +380,7 @@ def extract_product_name_component(block: HierarchicalAnnotation) -> 'AdBlockCom
     filtered_proper_nouns = [proper_noun for proper_noun in proper_nouns if len(proper_noun) > 2]
 
     for proper_noun in filtered_proper_nouns:
-        proper_noun.replace('U S A', 'U.S.A.')
+        proper_noun = proper_noun.replace('U S A', 'U.S.A.')
         product_of_phrase = 'product of ' + proper_noun
         text = text.replace(product_of_phrase, '')
 
@@ -347,7 +395,7 @@ def extract_product_name_component(block: HierarchicalAnnotation) -> 'AdBlockCom
     filtered_noun_phrases = [noun_phrase for noun_phrase in extracted_noun_phrases if len(noun_phrase) > 5]
 
     product_name = None
-    if len(filtered_noun_phrases) == 1:
+    if len(filtered_noun_phrases) > 0:
         product_name = filtered_noun_phrases[0]
 
     if product_name is None:
@@ -398,11 +446,11 @@ def _string_to_price(text: str) -> 'int | None':
         return None
 
     # Convert to cents if price is dollar value or has decimals
-    if price < 99 or price % 1 != 0:
+    if price < 20 or price % 1 != 0:
         price *= 100
 
-    # Valid prices range from $0.50 to $100
-    if price < 50 or price > 10000:
+    # Valid prices range from $0.20 to $100
+    if price < 20 or price > 10000:
         return None
 
     return int(price)

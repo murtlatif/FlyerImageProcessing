@@ -6,26 +6,33 @@ from google.cloud.vision import AnnotateImageResponse
 from ocr.annotation_types import Annotation, HierarchicalAnnotation
 from ocr.google_cloud.hierarchy_annotations import process_page_hierarchy
 from unidecode import unidecode
-from util.file_path_util import apply_default_file_ext
+from util.file_path_util import (apply_default_file_ext,
+                                 create_directories_to_file)
 
 
-def save_response_as_json(response: AnnotateImageResponse, file_name: str) -> str:
+def save_response_as_json(response: AnnotateImageResponse, file_path: str, use_default_directory: bool = True) -> str:
     """
     Saves a text detection response object as a JSON file.
 
     Args:
         response (AnnotateImageResponse): The response from the Cloud Vision text detection
-        file_name (str): The file name to save the JSON as
+        file_path (str): The file path to save the JSON to
+        default_directory (bool): Whether to prepend the default OCR output directory to the file path
 
     Returns:
         str: The response object represented as a JSON string
     """
     response_json = AnnotateImageResponse.to_json(response)
-    file_path = apply_default_file_ext(file_name, '.json')
+    file_path = apply_default_file_ext(file_path, '.json')
 
-    # Prepend OCR_OUTPUT_PATH if the value is set
-    if OCR_OUTPUT_PATH in Config.env:
+    if use_default_directory and OCR_OUTPUT_PATH in Config.env:
         file_path = os.path.join(Config.env.OCR_OUTPUT_PATH, file_path)
+
+    # Create the directories if not already made
+    create_directories_to_file(file_path)
+
+    if Config.args.verbose:
+        print(f'Writing JSON response to {file_path}.')
 
     with open(file_path, 'w') as response_json_file:
         response_json_file.write(response_json)

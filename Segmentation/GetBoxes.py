@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torch.utils.data
 import torchvision
+from config import Config
 from PIL import Image, ImageDraw
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from util.image_space import Region, Vertex
@@ -45,7 +46,8 @@ class GetBoxes():
 
     def getData(self):
         self.dataset = RaccoonDataset(root=self.data_folder, data_file=None, transforms=get_transform(train=False))
-        print(len(self.dataset))
+        if Config.args.verbose:
+            print(f'[SEGMENTATION MODEL]: Built dataset with {len(self.dataset)} files in {self.data_folder}')
 
     def getBoxes(self):
         self.boxes_dict: defaultdict[str, list[Region]] = defaultdict(list)
@@ -94,8 +96,12 @@ class GetBoxes():
 # print(getboxes.boxes_dict)
 
 
-def get_segmented_boxes(image_file: str, model_state_file: str, data_folder: str) -> list[Region]:
+def get_segmented_boxes(model_state_file: str, data_folder: str, image_file: str = None) -> 'list[Region] | defaultdict[str, list[Region]]':
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     box_getter = GetBoxes(2, model_state_file, device, data_folder)
     box_getter.getBoxes()
+
+    if image_file is None:
+        return box_getter.boxes_dict
+
     return box_getter.retBoxes(image_file)
