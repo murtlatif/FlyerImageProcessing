@@ -1,0 +1,902 @@
+{
+  "flyer_type": "weekly",
+  "pages": [
+    {
+      "page_type": "multi-ad",
+      "ad_blocks": [
+        {
+          "product": {
+            "name": "TOP SIRLOIN ROAST",
+            "description": "cryovac cut from Canada AA grade beef or higher or USDA Select grade beef rôti de haut de surlonge",
+            "code": "20357885 KG",
+            "price": 497,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "FARMER'S MARKET YELLOW POTATOES or YELLOW ONIONS",
+            "description": "product of Ontario, Canada no. 1 grade pommes ou oignons jaunes",
+            "code": "20600991001 EA/20601017001 EA",
+            "price": 197,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "LB",
+              "text": "10 LB BAG",
+              "amount": "10"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "PCⓇ SHRIMP PLATTER WITH MILD COCKTAIL SAUCE or NANUK SMOKED COHO SALMON, SLICED",
+            "description": null,
+            "code": "20147098 EA/20114139 EA",
+            "price": 1397,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "300-568 g, frozen couronne de crevettes avec sauce ou saumon fumé",
+              "amount": "300-568"
+            }
+          },
+          "promotion": {
+            "promotion_type": "flat",
+            "amount": "6.00",
+            "promotion_text": "SAVE UP TO 6.00"
+          },
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "RASPBERRIES product of U.S.A., no. 1 grade or BLACKBERRIES",
+            "description": "product of U.S.A. or Mexico framboises ou mûres",
+            "code": "20051015001 EA/20128938001_EA",
+            "price": 177,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "OZ",
+              "text": "6 OZ CLAMSHELL",
+              "amount": "6"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "SEAQUEST® SOLE, BASA, HADDOCK, WILD POLLOCK FILLET",
+            "description": null,
+            "code": "20153570 EA",
+            "price": 497,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "400 g, frozen sole, tilapia, pangasius, goberge sauvage",
+              "amount": "400"
+            }
+          },
+          "promotion": {
+            "promotion_type": "flat",
+            "amount": "2.00",
+            "promotion_text": "SAVE UP TO 2.00"
+          },
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "IÖGO NANO DRINKABLE YOGURT 6x93 mL or ASTRO ORIGINAL or BEATRICE STIRRED YOGURT 12's or TROPICANA JUICE or FRUIT BEVERAGE or PURE LEAF ICED TEA 1.54-1.75 L",
+            "description": "selected varieties yogourt à boire ou yogourt ou jus ou boissons aux fruits ou thé glacé",
+            "code": "20609687001_EA/21209836 EA",
+            "price": 287,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "ARMSTRONG or PCⓇ SHREDDED CHEESE 320 g, ARMSTRONG CHEESE 400 g",
+            "description": "selected varieties fromage",
+            "code": "21286240 EA/21346749 EA",
+            "price": 397,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": {
+            "promotion_type": "flat",
+            "amount": "1.00",
+            "promotion_text": "SAVE 1.00"
+          },
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "LANTIC SUGAR",
+            "description": null,
+            "code": "20145033 EA",
+            "price": 147,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "kg",
+              "text": "2 kg sucre",
+              "amount": "2"
+            }
+          },
+          "promotion": {
+            "promotion_type": "flat",
+            "amount": ".50",
+            "promotion_text": "SAVE .50"
+          },
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "REAL CANADIAN NATURAL SPRING WATER",
+            "description": null,
+            "code": "20154975 C24",
+            "price": 187,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "kg",
+              "text": "24x500 ml eau de source naturelle",
+              "amount": "24x500"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "MARS ASSORTED CHOCOLATE 65's or ASSORTED CANDY 70's BOX",
+            "description": "chocolats ou friandises",
+            "code": "20891614 EA/21186179 EA",
+            "price": 600,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "JANES BONELESS CHICKEN BREAST BITES or FILLETS",
+            "description": null,
+            "code": "21309075 EA",
+            "price": 747,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties, frozen 800g bouchées ou filets de poulet",
+              "amount": "800"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "LAY'S FAMILY SIZE POTATO CHIPS 220-255 g or TOSTITOS TORTILLA CHIPS 205-300 g",
+            "description": "selected varieties croustilles",
+            "code": "21241032 EA/21050581 EA",
+            "price": 177,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        }
+      ]
+    },
+    {
+      "page_type": "multi-ad",
+      "ad_blocks": [
+        {
+          "product": {
+            "name": "PCⓇ WHOLE or SLICED WHITE or CREMINI MUSHROOMS",
+            "description": "product of Ontario champignons blancs ou cremini entiers ou blancs",
+            "code": "20757811 EA/20743653 EA/20775805_EA/20776239 EA",
+            "price": 197,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "G",
+              "text": "227 G",
+              "amount": "227"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "ENGLISH CUCUMBERS",
+            "description": "product of Ontario, Canada no. 1 grade concombres",
+            "code": "20070132001 EA",
+            "price": 127,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "ACORN, BUTTERCUP, BUTTERNUT or SPAGHETTI SQUASH 2.14/kg or PIE PUMPKINS each",
+            "description": "product of Ontario courges ou citrouilles",
+            "code": "20071263001 KG/20101185001 EA",
+            "price": 97,
+            "price_unit": "lb/each",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "ORCHARD RUN CORTLAND or ROYAL GALA APPLES",
+            "description": "product of Ontario, Canada fancy grade pommes",
+            "code": "20914172001 KG/21160658001 KG",
+            "price": 127,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "MAPLE LEAF NATURAL SELECTIONS DELI MEAT",
+            "description": null,
+            "code": "20009282 EA/20065285 EA",
+            "price": 527,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 150/175 g charcuteries",
+              "amount": "150/175"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "MASTRO GENOA SALAMI or PILLER'S PEPPERONI STICKS or BITES",
+            "description": null,
+            "code": "20181136_EA/21099391 EA",
+            "price": 797,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 300-600 g salami ou bâtonnets ou bouchées de pepperoni",
+              "amount": "300-600"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "BOURSIN CHEESE 150 g or PCⓇ DOUBLE CREAM BRIE 200 g or CAMEMBERT CHEESE 170 g",
+            "description": "selected varieties fromage",
+            "code": "20116794 EA/20787327 EA",
+            "price": 500,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "NORDICA COTTAGE CHEESE",
+            "description": null,
+            "code": "20319458001 EA",
+            "price": 247,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties g or 4x100/113 g fromage cottage",
+              "amount": "450/500"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "CAVENDISH PREMIUM FRIES 540-750 g or PATTIES 600 g",
+            "description": "selected varieties, frozen frites ou galettes de pomme de terre",
+            "code": "20730092 EA/20962093 EA",
+            "price": 247,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "LECLERC CÉLÉBRATION COOKIES 240 g or GO PURE BARS 140/160 g",
+            "description": null,
+            "code": "21355599 EA/21359143 EA",
+            "price": 197,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "140/160 g selected varieties biscuits ou barres",
+              "amount": "140/160"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "QUAKER OATMEAL",
+            "description": null,
+            "code": "21190254 EA",
+            "price": 247,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 232-344 g gruau",
+              "amount": "232-344"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "HELLMANN'S MAYONNAISE",
+            "description": null,
+            "code": "20616579001 EA/20628485002 EA",
+            "price": 447,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "ml",
+              "text": "selected varieties 710-890 ml mayonnaise",
+              "amount": "710-890"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "NEILSON TRUTASTE 1%, 2% or SKIM or CHOCOLATE 4L or LACTOSE FREE 2 L MILK",
+            "description": "selected varieties lait",
+            "code": "20148677 EA/20188053001_EA",
+            "price": 497,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        }
+      ]
+    },
+    {
+      "page_type": "multi-ad",
+      "ad_blocks": [
+        {
+          "product": {
+            "name": "CRANBERRIES 340 g or CAULIFLOWER",
+            "description": "product of Canada, Canada no. 1 grade canneberges ou chou-fleur",
+            "code": "20135377001 EA/20160096001 EA",
+            "price": 197,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "SWEET POTATOES",
+            "description": "product of Ontario or U.S.A. patates douces",
+            "code": "20127708001 KG",
+            "price": 97,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "AVOCADOS",
+            "description": "product of Mexico avocat",
+            "code": "20142232001 EA",
+            "price": 397,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "PKG",
+              "text": "PKG OF 6",
+              "amount": "6"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "RUTABAGAS or PCⓇ LITTLE GEMS MINI MIXED, RED or YELLOW POTATOES 680 g",
+            "description": "product of Canada, Canada no. 1 grade mini-pommes de terre",
+            "code": "21247301001 EA/20146539 EA",
+            "price": 297,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "LB",
+              "text": "5 LB BAG",
+              "amount": "5"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "TOMATOES ON THE VINE",
+            "description": "product of Ontario tomates sur vigne",
+            "code": "20026703001 KG",
+            "price": 167,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "BROCCOLI CROWNS",
+            "description": "product of Canada couronnes de brocoli",
+            "code": "21121560001 EA",
+            "price": 147,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "CANTALOUPE",
+            "description": "product of U.S.A., no. 1 grade cantaloup",
+            "code": "20167017001 EA",
+            "price": 297,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "LEMONS",
+            "description": "product of South Africa citrons",
+            "code": "20028593001 EA",
+            "price": 100,
+            "price_unit": "2",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "EGGPLANT",
+            "description": "product of U.S.A. aubergine",
+            "code": "0155709001 KG",
+            "price": 197,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "TAYLOR FARMS SALAD KITS",
+            "description": null,
+            "code": "21335140 EA/21335159 EA",
+            "price": 700,
+            "price_unit": "2",
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties product of U.S.A. 319-383 g trousses de salade",
+              "amount": "319-383"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "REDDI-BULK SNACKS",
+            "description": null,
+            "code": "20673211 EA",
+            "price": 100,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 90-220 g collations",
+              "amount": "90-220"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "ORGANIC CELERY HEARTS",
+            "description": "product of U.S.A., no. 1 grade coeurs de céleri",
+            "code": "20600792001 EA",
+            "price": 297,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "PKG",
+              "text": "PKG OF 2",
+              "amount": "2"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "PCⓇ ORGANICS CARROTS",
+            "description": "product of U.S.A., no. 1 grade carottes",
+            "code": "20053421 EA",
+            "price": 247,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "LB",
+              "text": "2 LB BAG",
+              "amount": "2"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "PCⓇ ORGANICS BLACK, GREEN or RED SEEDLESS GRAPES",
+            "description": "product of U.S.A., no. 1 grade raisins noirs, verts ou rouges sans pépins",
+            "code": "20282624001 EA/20265555001 EA",
+            "price": 597,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "G",
+              "text": "907 G CLAMSHELL",
+              "amount": "907"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        }
+      ]
+    },
+    {
+      "page_type": "multi-ad",
+      "ad_blocks": [
+        {
+          "product": {
+            "name": "FRESH GRADE A TURKEYS",
+            "description": "selected varieties dindons entiers frais catégorie A",
+            "code": "20145891 KG",
+            "price": 227,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "LEAN GROUND PORK",
+            "description": "porc haché maigre",
+            "code": "20353851 KG",
+            "price": 397,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "PORK COMBO CHOPS",
+            "description": "bone-in, fresh côtelettes de porc, combinaison de coupes",
+            "code": "20683470 KG",
+            "price": 297,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "LEAN GROUND BEEF AND PORK",
+            "description": "mélange de boeuf et porc hachés maigres",
+            "code": "20861188 KG",
+            "price": 447,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "BEYOND MEAT PLANT BASED BREAKFAST SAUSAGES, ITALIAN SAUSAGES, GROUNDS or BURGERS",
+            "description": null,
+            "code": "21399630 EA/ 21300113 EA",
+            "price": 727,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties, 226-400 g saucisses ou simili-viande ou burgers à base de plantes",
+              "amount": "226-400"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "PCⓇ SPIRAL-SLICED BONE-IN HALF HAM",
+            "description": "applewood or hickory, smoked demi-jambon avec os tranché en spirale",
+            "code": "20857391 KG",
+            "price": 397,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "PC® APPETIZERS",
+            "description": null,
+            "code": "21116020 EA/21369924 EA",
+            "price": 1400,
+            "price_unit": "2",
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties, frozen 384-800 g hors-d'oeuvre",
+              "amount": "384-800"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "SEAQUEST COHO SALMON FILLET or HADDOCK FILLETS",
+            "description": "previously frozen filet de saumon ou filets d'aiglefin",
+            "code": "21166925 KG",
+            "price": 1097,
+            "price_unit": "LB",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "TRE STELLE BOCCONCINI",
+            "description": null,
+            "code": "20024992 EA",
+            "price": 500,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 200 g bocconcini",
+              "amount": "200"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "OLIVIERI FRESH PASTA 450/500 g or ZIGGY'S® TORTELLINI 600 g",
+            "description": "selected varieties pâtes fraîches ou tortellini",
+            "code": "20321512 EA/20950507 EA",
+            "price": 500,
+            "price_unit": null,
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "GO CRAB FLAVOURED STICK STYLE SURIMI",
+            "description": null,
+            "code": "21412473 EA",
+            "price": 100,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "frozen, 200 g surimi",
+              "amount": "200"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "FARMER'S MARKET LOAF CAKES 390 g",
+            "description": "selected varieties gâteau quatre-quarts",
+            "code": "20611092 EA",
+            "price": 400,
+            "price_unit": "2",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "FARMER'S MARKET PIES",
+            "description": null,
+            "code": "21297365 EA/21297367 EA",
+            "price": 1000,
+            "price_unit": "2",
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 900 g/1 kg tartes",
+              "amount": "900"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "COUNTRY HARVEST or THOMAS CINNAMON RAISIN BREAD",
+            "description": null,
+            "code": "20096232 EA/21178642 EA",
+            "price": 400,
+            "price_unit": "2",
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 570/675 g pain aux raisins",
+              "amount": "570/675"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "NO NAME BAGELS 6's or OLD MILL DINNER ROLLS 10's",
+            "description": "selected varieties bagels ou petits pains",
+            "code": "21025038 EA/21297816 EA",
+            "price": 300,
+            "price_unit": "2",
+            "quantity": null
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "NO NAMEⓇ TUNA",
+            "description": null,
+            "code": "20097482001_EA/20521648_EA",
+            "price": 100,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 85/170 g thon",
+              "amount": "85/170"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "NO NAMEⓇ COOKIES",
+            "description": null,
+            "code": "20300313001_EA/20318678002_EA",
+            "price": 297,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "g",
+              "text": "selected varieties 907 g biscuits",
+              "amount": "907"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        },
+        {
+          "product": {
+            "name": "NO NAMEⓇ OLIVES, GHERKINS or ONIONS",
+            "description": null,
+            "code": "20325649_EA",
+            "price": 147,
+            "price_unit": null,
+            "quantity": {
+              "measurement": "ml",
+              "text": "selected varieties, 375 ml olives ou cornichons ou oignons",
+              "amount": "375"
+            }
+          },
+          "promotion": null,
+          "bounds": [],
+          "additional_data": []
+        }
+      ]
+    }
+  ]
+}
