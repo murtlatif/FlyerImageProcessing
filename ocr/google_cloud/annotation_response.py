@@ -5,6 +5,7 @@ from config.env_keys import OCR_OUTPUT_PATH
 from google.cloud.vision import AnnotateImageResponse
 from ocr.annotation_types import Annotation, HierarchicalAnnotation
 from ocr.google_cloud.hierarchy_annotations import process_page_hierarchy
+from unidecode import unidecode
 from util.file_path_util import apply_default_file_ext
 
 
@@ -118,7 +119,7 @@ def response_to_flat_annotations(response: AnnotateImageResponse) -> list[Annota
 
         annotation = Annotation(
             bounds=text_annotation.bounding_poly.vertices,
-            text=text_annotation.description
+            text=unidecode(text_annotation.description)
         )
         annotations.append(annotation)
 

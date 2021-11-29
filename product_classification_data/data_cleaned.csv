@@ -1,0 +1,450 @@
+label,text
+0,apple
+0,apricot
+0,arrowroot
+0,artichoke
+0,arugula
+0,asparagus
+0,avocado
+0,bamboo shoots
+0,banana
+0,bean
+0,beet
+0,endive
+0,bitter melon
+0,blackberry
+0,blackcurrant
+0,blueberry
+0,bok choy
+0,breadfruit
+0,broadbeans 
+0,broccoli
+0,broccoli rabe
+0,brussel sprouts
+0,butternut squash
+0,cabbage
+0,cantaloupe
+0,carrot
+0,cassava 
+0,cauliflower
+0,celeriac 
+0,celery
+0,celery root
+0,cherry
+0,chicory 
+0,clementine
+0,coconut
+0,collard
+0,corn
+0,cranberry
+0,crookneck
+0,cucumber
+0,daikon
+0,dandelion greens
+0,date fruit
+0,dragonfruit
+0,durian
+0,edamame
+0,eggplant
+0,elderberry
+0,fava beans
+0,feijoa
+0,fennel
+0,fiddlehead
+0,fig
+0,ginger
+0,gooseberry
+0,grape
+0,grapefruit
+0,green beans
+0,green cabbage
+0,green peas
+0,green pepper
+0,guava
+0,honeydew melon
+0,horseradish
+0,iceberg lettuce
+0,jackfruit
+0,java-plum
+0,jicama
+0,jujube fruit
+0,kale
+0,kiwifruit
+0,kohlrabi
+0,kumquat
+0,leaf lettuce
+0,leek
+0,lemon
+0,lettuce
+0,lime
+0,longan
+0,loquat
+0,lychee
+0,mamey sapote
+0,mandarin
+0,mango
+0,mangosteen
+0,mulberry
+0,mushroom
+0,mustard greens
+0,nectarine
+0,okra
+0,olive
+0,onion
+0,onion 
+0,orange
+0,papaya
+0,parsnip
+0,passion fruit
+0,pea
+0,peach
+0,pear
+0,pepper
+0,persimmon
+0,pineapple
+0,pitanga
+0,pitaya 
+0,plantain
+0,plum
+0,pomegranate
+0,potato
+0,prickly pear
+0,prune
+0,pommelo
+0,pumpkin
+0,quince
+0,radicchio
+0,radish
+0,raspberry
+0,cabbage
+0,potato
+0,rhubarb
+0,lettuce
+0,apple
+0,rutabaga
+0,sapote
+0,shallot
+0,snow peas
+0,soursop
+0,soybeans
+0,edamame
+0,spaghetti squash
+0,spinach
+0,squash
+0,strawberry
+0,sugar snap peas
+0,sugar-apple
+0,sweet potato
+0,sweet red pepper
+0,swiss chard
+0,tamarind
+0,tangerine
+0,tomatillo
+0,tomato
+0,turnip
+0,watercress
+0,watermelon
+0,white potato
+0,yam root
+0,yellow potato
+0,yuca root
+0,zucchini
+1,meat
+1,beef
+1,belly
+1,best end
+1,bone
+1,boneless
+1,breast
+1,brisket
+1,butterfly
+1,chine
+1,chuck roll
+1,chump
+1,cornfed chicken
+1,drum sticks
+1,fillet
+1,flank
+1,flank steak
+1,foie gras
+1,fore ribs
+1,front
+1,guinea fowl
+1,knuckle
+1,lamb
+1,leg
+1,liver
+1,loin
+1,mutton legs
+1,neck ends
+1,neck fillets
+1,pig
+1,pony
+1,poussin
+1,rabbit
+1,rack
+1,ribeye
+1,rump
+1,rump tail
+1,shin
+1,short fore
+1,shoulder
+1,silverside
+1,smoked portions
+1,striploin
+1,supremes
+1,thigh
+1,top bits
+1,topside
+1,trim
+1,veal
+1,venison
+1,whole birds
+1,whole ducks
+1,whole lambs
+1,whole pigs / sides
+1,whole sides
+1,wild boar
+1,wing
+2,syrup
+2,anchovy fillets
+2,apple cider vinegar
+2,applesauce
+2,fish sauce
+2,baking powder
+2,baking soda
+2,balsamic
+2,black peppercorns
+2,breakfast cereal
+2,brown rice
+2,brown sugar
+2,cajun seasoning
+2,cayenne pepper
+2,chile
+2,chile powder
+2,cocoa powder
+2,coffee
+2,sugar
+2,cracker
+2,crackers
+2,cream of tartar
+2,crushed red pepper
+2,curry powder
+2,dough
+2,dried fruit
+2,extra virgin olive oil
+2,fine salt
+2,flour
+2,grain
+2,granola bars
+2,granulated garlic
+2,granulated sugar
+2,ground cinnamon
+2,ground cloves
+2,ground cumin
+2,ground ginger
+2,honey
+2,hot sauce
+2,jam
+2,jelly
+2,jerky
+2,ketchup
+2,kosher salt
+2,long-grain white rice
+2,maple syrup
+2,marshmallow
+2,mayonnaise
+2,mustard
+2,nachos
+2,nut
+2,rolled oats
+2,oregano
+2,paprika
+2,peanut butter
+2,peanuts
+2,pickle
+2,polenta
+2,popcorn
+2,popcorn kernels
+2,potato chips
+2,pretzel
+2,pretzels
+2,protein bars
+2,pure vanilla extract
+2,red wine vinegar
+2,rice vinegar
+2,roasted red peppers
+2,rosemary
+2,salsa
+2,seed
+2,sesame seeds
+2,soy sauce
+2,tea
+2,thyme
+2,toasted sesame oil
+2,tomato paste
+2,tortilla
+2,tuna
+2,vegetable oil
+2,whole nutmeg
+2,worcestershire sauce
+3,bagel
+3,baguette
+3,baklava
+3,bear claw
+3,beaver tail
+3,biscotti
+3,biscuit
+3,bread
+3,breadstick
+3,brioche
+3,bun
+3,cake
+3,candy
+3,cannoli
+3,challah
+3,chocolate
+3,chocolate chip
+3,choux
+3,churro
+3,cinnamon bun
+3,cinnamon roll
+3,confection
+3,cookie
+3,cornbread
+3,cream
+3,creme brulee
+3,cream puff
+3,croissant
+3,cronut
+3,crumpet
+3,custard
+3,danish
+3,dessert
+3,donut
+3,doughnut
+3,eclair
+3,english muffin
+3,filo
+3,flan
+3,focaccia
+3,fritter
+3,frosting
+3,gingerbread
+3,icing
+3,jelly
+3,loaf
+3,mantou
+3,meringue
+3,mille-feuille
+3,mochi
+3,mooncake
+3,muffin
+3,naan
+3,nanaimo bar
+3,pain au chocolat
+3,palmier
+3,panettone
+3,pastie
+3,pastry
+3,phyllo
+3,pie
+3,pita
+3,pretzel
+3,profiterole
+3,pudding
+3,quiche
+3,quick-breads
+3,rugelach
+3,samosa
+3,scone
+3,shortbread
+3,streusel
+3,strudel
+3,swiss roll
+3,taffy
+3,taiyaki
+3,tart
+3,toffee
+3,tortilla
+3,waffle
+3,wedding
+4,dairy
+4,acidophilus milk
+4,ammonium caseinate
+4,butter
+4,butter esters
+4,butter fat
+4,butter oil
+4,butter solids
+4,buttermilk
+4,buttermilk powder
+4,calcium caseinate
+4,casein
+4,caseinate
+4,cheese
+4,condensed milk
+4,cottage cheese
+4,cream
+4,curd
+4,delactosed whey
+4,demineralized whey
+4,dry milk powder
+4,dry milk solids
+4,evaporated milk
+4,free-range eggs
+4,free-run eggs
+4,eggs
+4,ghee
+4,goat cheese
+4,goat milk
+4,half & half
+4,hydrolyzed casein
+4,hydrolyzed milk protein
+4,iron caseinate
+4,lactalbumin
+4,lactoferrin
+4,lactoglobulin
+4,lactose
+4,lactulose
+4,low-fat milk
+4,magnesium caseinate
+4,malted milk
+4,milk
+4,milk derivative
+4,milk fat
+4,milk powder
+4,milk protein
+4,milk solids
+4,natural butter flavor
+4,nonfat milk
+4,nougat
+4,omega-3 eggs
+4,organic eggs
+4,paneer
+4,potassium caseinate
+4,processed eggs
+4,pudding
+4,recaldent
+4,rennet casein
+4,sheep milk
+4,sheep milk cheese
+4,skim milk
+4,sodium caseinate
+4,sour cream
+4,sour milk solids
+4,standard brown eggs
+4,standard white eggs
+4,sweet whey
+4,sweetened condensed milk
+4,vegetarian eggs
+4,vitamin-enhanced eggs
+4,whey
+4,whey powder
+4,whey protein concentrate
+4,whey protein hydrolysate
+4,whipped cream
+4,whipped topping
+4,whole milk
+4,yogurt
+4,zinc caseinate

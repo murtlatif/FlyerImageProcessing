@@ -64,17 +64,16 @@ class GetBoxes():
 
             # Go through all boxes the model predicted
             for element in range(len(prediction[0]["boxes"])):
-                boxes = prediction[0]["boxes"][element].cpu().numpy().astype(int)
+                boxes = prediction[0]["boxes"][element].cpu().numpy()
                 score = np.round(prediction[0]["scores"][element].cpu().numpy(), decimals=4)
                 # Only select boxes the model is confident about
                 if score > 0.8:
-                    # top-left, top-right, bottom-right, bottom-left
-                    left, up, right, down = boxes[0], boxes[1], boxes[2], boxes[3]
+                    left, top, right, bottom = int(boxes[0]), int(boxes[1]), int(boxes[2]), int(boxes[3])
                     box = [
-                        Vertex(left, up),
-                        Vertex(right, up),
-                        Vertex(left, down),
-                        Vertex(right, down),
+                        Vertex(left, top),
+                        Vertex(left, bottom),
+                        Vertex(right, bottom),
+                        Vertex(right, top),
                     ]
                     self.boxes_dict[name].append(box)
 

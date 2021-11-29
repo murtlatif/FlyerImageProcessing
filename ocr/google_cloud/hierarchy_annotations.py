@@ -1,7 +1,8 @@
 from google.cloud.vision_v1.types import Block, Page, Paragraph, Symbol, Word
 from google.cloud.vision_v1.types.geometry import BoundingPoly
 from ocr.annotation_types import AnnotationLevel, HierarchicalAnnotation
-from util.image_space import Vertex, Region
+from unidecode import unidecode
+from util.image_space import Region, Vertex
 
 
 def process_page_hierarchy(page: Page) -> HierarchicalAnnotation:
@@ -120,7 +121,7 @@ def process_symbol_hierarchy(symbol: Symbol) -> HierarchicalAnnotation:
     Returns:
         HierarchicalAnnotation: Resulting annotation
     """
-    symbol_text = symbol.text
+    symbol_text = unidecode(symbol.text)
     detected_break = symbol.property.detected_break
     break_type = detected_break.type_
     is_break_prefix = detected_break.is_prefix

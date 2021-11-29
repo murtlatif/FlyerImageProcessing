@@ -102,14 +102,19 @@ def ocr_main():
     command = Config.args.command
 
     if command == COMMAND.ANNOTATIONS:
+        if Config.args.verbose:
+            print(hierarchical_annotations)
+
         if Config.args.display:
             draw_hierarchical_annotations(image_path, hierarchical_annotations, annotation_level_whitelist={
                 AnnotationLevel.PAGE, AnnotationLevel.BLOCK})
-        else:
-            print(hierarchical_annotations)
 
     if command == COMMAND.FLYER:
         flyer = process_flyer(hierarchical_annotations)
+
+        if Config.args.verbose:
+            print(flyer)
+
         if Config.args.save:
             save_file_name = get_file_name_without_ext(annotation_file or image_path or 'UnnamedFlyer')
             save_flyer(flyer, file_path=save_file_name)
@@ -119,8 +124,11 @@ def ocr_main():
 
     if command == COMMAND.SEGMENTATION:
         flyer = process_segmented_flyer(hierarchical_annotations, image_path, model_state_file)
-        if Config.args.save:
 
+        if Config.args.verbose:
+            print(flyer)
+
+        if Config.args.save:
             save_file_name = get_file_name_without_ext(annotation_file or image_path or 'UnnamedFlyer')
             save_flyer(flyer, file_path=f'{save_file_name}_segmented')
 
