@@ -6,9 +6,11 @@ _Created by Stephen Brade, Sandra Petkovic, Murtaza Latif and Lisa Li_
 
 To setup the program, read the [Getting Started](docs/GettingStarted.md) documentation.
 
-## How to Label Flyers
+## How to Label Flyers to Train the Model on a New Grocer
 
 ### LabelImg
+
+Please have a subset of the grocer's flyer page images (as `.png` files) in a folder called `data`.
 
 The tool we used to annotate flyer images is called LabelImg. More details about the tool can be found at [https://github.com/tzutalin/labelImg](https://github.com/tzutalin/labelImg).
 
@@ -34,3 +36,34 @@ After you label your first ad block, the desktop app should look like the exampl
 ![](README_images/labelImg1.png)
 
 Now do this for every ad block on the page. Ensure that every rectangle is labelled with `ad_block`. Once you're done, click on "Save" on the left hand side. Save in the same folder and the same name as the flyer image. This will create a file called `<flyer_image_name>.xml` that will be processed later. Repeat this process for every individual flyer page image.
+
+Once you are done labelling, you may close labelImg.
+
+### Turning LabelImg xml files into training data
+
+Your `data` folder should now contain an `.xml` file for every flyer image. Move the `data` folder to the `Segmentation/` directory is this repo.
+
+To seperate the `.xml` and flyer image files into seperate folders, run
+
+```bash
+$ python3 organize_files.py
+```
+
+The `.xml` files are now in a folder called `Segmentation/annotation/` and the images are in `Segmentation/images/`. To turn the `.xml` files into `labels.csv`, run
+
+```bash
+$ python3 xml_to_csv.py
+```
+
+To train the model, in `train.py`, please change the routes of `dataset`
+
+```python
+dataset = RaccoonDataset(
+    root="./",
+    data_file="./labels.csv",
+    img_folder="./images",
+    transforms=get_transform(train=True),
+)
+```
+
+The saved model (use the cpu model if you do not have a gpu) will be passed through the -sm argument in the config for the Flyer Processing Pipeline.
