@@ -16,8 +16,11 @@ from .annotation_types import HierarchicalAnnotation
 from .ocr_flyer_analysis import extract_components_from_block
 
 
-def construct_flyer_from_pages(pages: list[Page]) -> Flyer:
+def construct_flyer_from_pages(pages: list[Page], flyer_name: str) -> Flyer:
     """
+    TODO: Implement extraction of date by doing regex search of dates within
+    page annotation texts.
+
     Creates a Flyer object from a list of Pages.
     """
     flyer_type = FlyerType.WEEKLY
@@ -26,23 +29,36 @@ def construct_flyer_from_pages(pages: list[Page]) -> Flyer:
             flyer_type = FlyerType.HOLIDAY
             break
 
-    flyer = Flyer(flyer_type=flyer_type, pages=pages)
+    flyer = Flyer(
+        flyer_type=flyer_type,
+        flyer_name=flyer_name,
+        flyer_date=None,
+        num_pages=len(pages),
+        pages=pages
+    )
     return flyer
 
 
-def construct_page_from_ad_blocks(ad_blocks: list[AdBlock], page_annotation: HierarchicalAnnotation) -> Page:
+def construct_page_from_ad_blocks(page_number: int, page_file_name: str, ad_blocks: list[AdBlock], page_annotation: HierarchicalAnnotation) -> Page:
     """
     Creates a Page object from a list of AdBlocks.
     """
     page_type = PageType.MULTI_AD if len(ad_blocks) > 1 else PageType.OTHER
 
     has_holiday_content = contains_holiday_text(page_annotation.text)
-    page = Page(page_type, ad_blocks, has_holiday_content)
+    page = Page(
+        page_number=page_number,
+        page_file_name=page_file_name,
+        page_type=page_type,
+        num_ad_blocks=len(ad_blocks),
+        ad_blocks=ad_blocks,
+        has_holiday_content=has_holiday_content,
+    )
 
     return page
 
 
-def process_page_annotation(page_annotation: HierarchicalAnnotation) -> Page:
+def process_page_annotation(page_number: int, page_file_name: str, page_annotation: HierarchicalAnnotation) -> Page:
     """
     Use a Page level HierarchicalAnnotation to extract the ad blocks
     shown on the page. The ad blocks and additional data are used to
@@ -58,38 +74,31 @@ def process_page_annotation(page_annotation: HierarchicalAnnotation) -> Page:
 
     ad_blocks = construct_ad_blocks_from_components(all_ad_block_components)
 
-    page = construct_page_from_ad_blocks(ad_blocks, page_annotation)
+    page = construct_page_from_ad_blocks(page_number, page_file_name, ad_blocks, page_annotation)
 
     return page
 
 
-def process_flyer_annotation(page_annotations: list[HierarchicalAnnotation]) -> Flyer:
+def process_flyer_annotation(page_annotations: list[HierarchicalAnnotation], flyer_name: str) -> Flyer:
     """
     Processes a list of page annotations into a Flyer object.
     """
     pages: list[Page] = []
 
-    for page_annotation in page_annotations:
-        page = process_page_annotation(page_annotation)
+    for page_number, page_annotation in enumerate(page_annotations):
+        page = process_page_annotation(page_number, page_annotation)
         pages.append(page)
 
-    flyer = construct_flyer_from_pages(pages)
+    flyer = construct_flyer_from_pages(pages, flyer_name)
 
     return flyer
 
 
-def process_segmented_page_annotation(page_annotation: HierarchicalAnnotation, page_segmentation: list[Region]) -> Page:
+def process_segmented_page_annotation(page_number: int, page_file_name: str, page_annotation: HierarchicalAnnotation, page_segmentation: list[Region]) -> Page:
     """
     Creates a list of ad blocks bounded by the page segmentation which
     contain the parsed data from the page annotations. These ad blocks
     are formed into a Page object.
-
-    Args:
-        page_annotation (HierarchicalAnnotation): Annotation for the page
-        page_segmentation (list[Region]): Segmented regions for ad blocks
-
-    Returns:
-        Page: Processed Page object
     """
     ad_blocks: list[AdBlock] = []
 
@@ -109,28 +118,26 @@ def process_segmented_page_annotation(page_annotation: HierarchicalAnnotation, p
         ad_block = construct_segmented_block_from_components(all_ad_block_components, segment_bounds)
         ad_blocks.append(ad_block)
 
-    page = construct_page_from_ad_blocks(ad_blocks, page_annotation)
+    page = construct_page_from_ad_blocks(page_number, page_file_name, ad_blocks, page_annotation)
     return page
 
 
-def process_segmented_flyer_annotations(page_annotations: list[HierarchicalAnnotation], page_segmentations: list[list[Region]]) -> Flyer:
+def process_segmented_flyer_annotations(
+    page_file_names: list[str],
+    page_annotations: list[HierarchicalAnnotation],
+    page_segmentations: list[list[Region]],
+    flyer_name: str
+) -> Flyer:
     """
     Processes a list of pages and segmentation data into a Flyer object.
-
-    Args:
-        page_annotations (list[HierarchicalAnnotation]): Page annotations
-        page_segmentations (list[list[Region]]): Segmentations for each page
-
-    Returns:
-        Flyer: Processed Flyer object
     """
     pages: list[Page] = []
 
-    for page_annotation, page_segmentation in zip(page_annotations, page_segmentations):
-        page = process_segmented_page_annotation(page_annotation, page_segmentation)
+    for page_number, (page_file_name, page_annotation, page_segmentation) in enumerate(zip(page_file_names, page_annotations, page_segmentations)):
+        page = process_segmented_page_annotation(page_number, page_file_name, page_annotation, page_segmentation)
         pages.append(page)
 
-    flyer = construct_flyer_from_pages(pages)
+    flyer = construct_flyer_from_pages(pages, flyer_name)
     return flyer
 
 
@@ -204,7 +211,9 @@ def construct_segmented_block_from_components(components: defaultdict[AdBlockCom
         extra_components.extend(promotions[1:])
 
     # Get the category from the product classifier
-    product_category, confidence = product_classifier.classify(product_name)
+    product_category, confidence = None, None
+    if product_name:
+        product_category, confidence = product_classifier.classify(product_name)
 
     product = Product(
         name=product_name,

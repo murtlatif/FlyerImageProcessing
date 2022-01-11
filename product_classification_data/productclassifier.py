@@ -16,6 +16,9 @@ class ProductClassifier():
         ]
 
     def classify(self, name):
+        if name is None:
+            return None, None
+
         embedding = [self.BERT.encode(name).tolist()]
         category = int(self.model.predict(embedding))
         confidence = self.model.predict_proba(embedding)[0][category]

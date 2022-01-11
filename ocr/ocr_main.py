@@ -1,7 +1,7 @@
 import os.path
 
 from config import Config
-from flyer.flyer_components import Flyer
+from flyer.flyer_components import Flyer, Page
 from flyer.marshal_flyer import marshal_flyer
 from Segmentation.GetBoxes import get_segmented_boxes
 from util.constants import ANNOTATION_LEVEL_COLORS, COMMAND
@@ -71,8 +71,8 @@ def save_flyer(flyer: Flyer, file_path: str) -> None:
     marshal_flyer(flyer, file_path=file_path)
 
 
-def draw_flyer_ad_blocks(flyer: Flyer, image_path: 'str | None') -> None:
-    draw_ad_blocks(image_path, flyer.pages[0].ad_blocks)
+def draw_flyer_ad_blocks(page: Page, image_path: 'str | None') -> None:
+    draw_ad_blocks(image_path, page.ad_blocks)
 
 
 def process_flyer(hierarchical_annotations: list[HierarchicalAnnotation]) -> Flyer:

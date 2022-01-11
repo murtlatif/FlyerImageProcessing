@@ -46,20 +46,27 @@ def get_transform(train):
         transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
 
+def scantree(path, ignore_folders={'preprocessed'}):
+    """Recursively yield DirEntry objects for given directory."""
+    for entry in os.scandir(path):
+        if entry.is_dir(follow_symlinks=False) and entry.name not in ignore_folders:
+            yield from scantree(entry.path)  # see below for Python 2.x
+        else:
+            yield entry
 
 class RaccoonDataset(torch.utils.data.Dataset):
     def __init__(self, root, data_file, transforms=None):
         self.root = root
         self.transforms = transforms
         self.imgs = [
-            entry.name for entry in os.scandir(root)
+            entry.path for entry in scantree(root)
             if entry.is_file() and has_extension(entry.name, valid_extensions=VALID_IMAGE_FILE_TYPES)
         ]
         self.path_to_data_file = data_file
 
     def __getitem__(self, idx):
         # load images and bounding boxes
-        img_path = os.path.join(self.root, self.imgs[idx])
+        img_path = self.imgs[idx]
         img = Image.open(img_path).convert("RGB")
         if self.path_to_data_file is None:
             # num_objs = len(box_list)

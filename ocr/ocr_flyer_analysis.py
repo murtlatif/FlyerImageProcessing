@@ -69,7 +69,8 @@ def extract_product_code_component(block: HierarchicalAnnotation) -> 'AdBlockCom
     text = ' '.join(block.text.split())
 
     product_code_regex = Config.env.PRODUCT_CODE_REGEX
-    product_code_match = re.search(product_code_regex, text)
+    multi_product_code_regex = product_code_regex + r'([-\/ ]' + product_code_regex + r')?'
+    product_code_match = re.search(multi_product_code_regex, text)
 
     if product_code_match is None:
         return None
@@ -93,7 +94,7 @@ def extract_quantity_component(block: HierarchicalAnnotation) -> 'AdBlockCompone
 
     # Check if the measurement is "PKG OF N"
     package_unit_pattern = '|'.join(PACKAGE_MEASURE_WORD_LIST)
-    pkg_of_pattern = '((' + package_unit_pattern + r') of )(((\d+(\.\d+)?) ?[-x] ?)?(\d+(\.\d+)?))'
+    pkg_of_pattern = '((' + package_unit_pattern + r') of )(((\d+(\.\d+)?) ?[-\/x] ?)?(\d+(\.\d+)?))'
     pkg_of_match = re.search(pkg_of_pattern, text, flags=re.IGNORECASE)
 
     if pkg_of_match:
@@ -116,7 +117,7 @@ def extract_quantity_component(block: HierarchicalAnnotation) -> 'AdBlockCompone
 
     # Matches a measurement with an optional number in front (including decimals)
     measurements_union_regex = '(' + '|'.join(MEASUREMENT_WORD_LIST) + ')'
-    quantity_amount_regex = r'(((\d+(\.\d+)?) ?[-x] ?)?(\d+(\.\d+)?) ?)'
+    quantity_amount_regex = r'(((\d+(\.\d+)?) ?[-\/x] ?)?(\d+(\.\d+)?) ?)'
     quantity_regex_pattern = quantity_amount_regex + measurements_union_regex + r'\b'
 
     quantity_regex_match = re.search(quantity_regex_pattern, text, flags=re.IGNORECASE)
@@ -249,7 +250,8 @@ def extract_promotion_component(block: HierarchicalAnnotation) -> 'AdBlockCompon
     # TODO: Check other promotion types here
 
     # Finally: Check for amount value and generic promotion text
-    amount_pattern = r'\$?((\d+(\.\d+)?)%? ?- ?)?\$?(\d+(\.\d+)?)%?'
+    # (\$?(\d+(\.\d+)?)%? ?- ?)?(\$?(\d+(\.\d+)?)%?)
+    amount_pattern = r'(\$?(\d+(\.\d+)?)%? ?- ?)?(\$?(\d+(\.\d+)?)%?)'
     amount_match = re.search(amount_pattern, text)
     if amount_match is None:
         return None

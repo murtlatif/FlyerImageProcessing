@@ -88,7 +88,10 @@ class AdBlock:
 
 @dataclass
 class Page:
+    page_number: int
+    page_file_name: str
     page_type: PageType = None
+    num_ad_blocks: int = None
     ad_blocks: list[AdBlock] = field(default_factory=list)
     has_holiday_content: bool = False
 
@@ -96,4 +99,7 @@ class Page:
 @dataclass
 class Flyer:
     flyer_type: FlyerType = None
+    flyer_name: str = None
+    flyer_date: str = None
+    num_pages: int = None
     pages: list[Page] = field(default_factory=list)
