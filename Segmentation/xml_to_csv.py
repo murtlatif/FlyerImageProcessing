@@ -10,6 +10,7 @@ def xml_to_csv(path):
         tree = ET.parse(xml_file)
         root = tree.getroot()
         for member in root.findall('object'):
+            # Swap png for other image file type if necessary
             value = (xml_file.split('/')[-1].replace('.xml', '.png'),
                      int(root.find('size')[0].text),
                      int(root.find('size')[1].text),
