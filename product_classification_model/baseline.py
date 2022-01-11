@@ -97,14 +97,9 @@ def get_pred(query):
         scores = np.array([])
 
         for category in [produce, meat, grocery, bakery, dairy, household]:
-            score = np.mean(
+            score = np.sum(
                 np.array([1 if word in tokenized_words else 0 for word in category])
             )
-            # print("------")
-            # for word in tokenized_words:
-            #     if word in category:
-            #         print(word)
-            # print("------")
             scores = np.append(scores, score)
 
         if np.amax(scores) > prediction["max_score"]:
