@@ -167,7 +167,7 @@ for epoch in range(num_epochs):
 
 print(max_p, max_r)
 
-torch.save(best_model.state_dict(), "models/color_lisa")
+torch.save(best_model.state_dict(), "models/color")
 device = torch.device("cpu")
 model.to(device)
-torch.save(best_model.state_dict(), "models/color_lisa_cpu")
+torch.save(best_model.state_dict(), "models/color_cpu")

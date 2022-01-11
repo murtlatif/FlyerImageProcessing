@@ -55,7 +55,7 @@ The `.xml` files are now in a folder called `Segmentation/annotation/` and the i
 $ python3 xml_to_csv.py
 ```
 
-To train the model, in `train.py`, please change the routes of `dataset`
+Should you change the directories or filename mentioned above, please change the routes of `dataset` in `train.py` here
 
 ```python
 dataset = RaccoonDataset(
