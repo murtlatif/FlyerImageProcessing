@@ -196,6 +196,37 @@ def process_segmented_flyer(flyer_name: str, image_file_paths: list[str], annota
 
 
 if __name__ == '__main__':
+    """
+    This program will get annotation data on the given input, segment
+    the input, then process the input into segmented flyer data.
+
+    The input folder structure is as follows:
+
+    root/
+        data/
+            flyer_name/
+                page_1.png
+                page_2.png
+                page_3.png
+                ...
+            other_flyer_name/
+                page_1.png
+                ...
+
+    Inside each flyer folder, three new folders will be generated to
+    store the OCR annotation data, the preprocessed images, and the
+    output data for the flyer.
+
+    Output Flags:
+        -v, --verbose: Segmentation process will be printed. Will print
+        the flyer data if this flag is used at least twice (e.g. -vv)
+
+        -s, --save: Save the flyer data intou the OUTPUT_FLYER_FOLDER
+        for each input.
+
+        -d, --display: Draws ad blocks onto the image and displays the
+        last page for each flyer that is processed.
+    """
 
     # Initialization
     ANNOTATION_DATA_FOLDER = Config.env.DATA_ANNOTATION_PATH or 'ocr_annotations'
